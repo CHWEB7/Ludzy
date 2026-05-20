@@ -16,6 +16,7 @@ export function LudzyLogoImage({ className = "" }: { className?: string }) {
         decoding="async"
         fetchPriority="high"
         className="ludzy-header-logo"
+        style={{ width: "9.75rem", height: "auto", maxHeight: "2.85rem" }}
       />
     </div>
   );

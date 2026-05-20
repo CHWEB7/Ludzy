@@ -88,7 +88,7 @@ export function FloatingHeader() {
             <div className="flex items-end justify-between gap-3 px-4 py-3 md:gap-6 md:px-6 md:py-3.5">
               <Link
                 href="#top"
-                className="group flex min-w-0 cursor-pointer items-end gap-2.5 sm:gap-3 md:gap-3.5"
+                className="ludzy-brand-lockup group flex shrink-0 cursor-pointer items-end gap-2 sm:gap-2.5 md:gap-3"
                 aria-label="LUDZY home"
               >
                 <SoundBars />
