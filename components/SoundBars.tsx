@@ -8,8 +8,8 @@ export function SoundBars() {
       {heights.map((h, i) => (
         <span
           key={i}
-          className={`w-1 origin-bottom rounded-full bg-gradient-to-t from-white/30 to-white ${h} animate-sound-bar`}
-          style={{ animationDelay: `${i * 0.08}s` }}
+          className={`sound-bar-spectrum ${h}`}
+          style={{ animationDelay: `0s, ${i * 0.08}s` }}
         />
       ))}
     </div>
