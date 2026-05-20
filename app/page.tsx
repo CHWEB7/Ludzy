@@ -1,40 +1,34 @@
-import Image from "next/image";
 import { BookingForm } from "@/components/BookingForm";
-import { HeroPhotoCard } from "@/components/HeroPhotoCard";
+import { HeroPhotoCard, type HeroPhotoCardProps } from "@/components/HeroPhotoCard";
 import { MixcloudEmbed } from "@/components/MixcloudEmbed";
 import { ServiceGrid } from "@/components/ServiceGrid";
 
 const MIXCLOUD_CHILLED_IBIZA =
   "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/";
 
-/** Swap to `/images/hero-light-trails.jpg` for your own long-exposure light-trails photo */
-const heroMainTextureSrc =
-  "https://images.unsplash.com/photo-1544984241-ec57ea16fe25?auto=format&fit=crop&w=2000&q=85";
-
-const heroPhotos = [
+const heroTiles: HeroPhotoCardProps[] = [
   {
     title: "Evening social",
-    caption: "Smoke, rim light & groove",
-    /* DJ silhouette / mixer — grayscale applied in-card; swap to /images/evening-social.jpg if you upload the exact flyer photo */
-    src: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=80",
-    alt: "Greyscale DJ performance with hands at the mixer and stage haze",
-    minHeightClass: "min-h-[188px]",
+    caption: "Motion & mood",
+    videoSrc: "/videos/evening-social.mp4",
+    alt: "Greyscale ambient video loop for evening social",
+    minHeightClass: "min-h-[200px]",
   },
   {
-    title: "In the booth",
-    caption: "Hands on the mix",
-    src: "https://images.unsplash.com/photo-1470225627910-9fb66461bbfe?auto=format&fit=crop&w=1200&q=75",
-    alt: "Monochrome close-up of DJ turntables and mixer in low light",
+    title: "House music",
+    caption: "Sunset palms & warm grooves",
+    src: "https://images.unsplash.com/photo-1437719417032-8595f9cfcfee?auto=format&fit=crop&w=1400&q=82",
+    alt: "Greyscale palm trees and beach at sunset",
     minHeightClass: "min-h-[208px]",
   },
   {
-    title: "Lounge vignette",
-    caption: "Low light, soft seats",
-    src: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=75",
-    alt: "Greyscale interior of a dim lounge with sofas",
-    minHeightClass: "min-h-[148px]",
+    title: "Dance music",
+    caption: "Festival energy & lights",
+    src: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1400&q=82",
+    alt: "Greyscale festival crowd with DJ and stage lights",
+    minHeightClass: "min-h-[160px]",
   },
-] as const;
+];
 
 export default function Home() {
   return (
@@ -53,31 +47,7 @@ export default function Home() {
       <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-8 md:px-10 md:pt-10">
         {/* Hero — bento */}
         <section className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-          <div className="relative flex flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-neutral-950/40 p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:col-span-7 lg:min-h-[420px]">
-            {/* Background — monochrome energy, black toward top for typography */}
-            <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit]">
-              <Image
-                src={heroMainTextureSrc}
-                alt=""
-                aria-hidden
-                fill
-                className="scale-105 object-cover object-center grayscale-[0.92] brightness-[0.85] contrast-[1.08] saturate-0"
-                sizes="(max-width: 1024px) 100vw, 66vw"
-                priority
-              />
-              {/* Black falloff at top */}
-              <div
-                className="absolute inset-0 bg-[linear-gradient(to_bottom,_rgba(0,0,0,1)_0%,_rgba(0,0,0,0.88)_18%,_rgba(0,0,0,0.45)_45%,_rgba(0,0,0,0.12)_68%,_transparent_100%)]"
-                aria-hidden
-              />
-              {/* Readability: soft side vignettes */}
-              <div
-                className="absolute inset-0 bg-[radial-gradient(ellipse_at_120%_-10%,transparent_52%,rgba(0,0,0,0.55)_96%)]"
-                aria-hidden
-              />
-              <div className="absolute inset-0 bg-black/35" aria-hidden />
-            </div>
-
+          <div className="glass-panel relative flex flex-col overflow-hidden rounded-[2rem] p-8 ring-1 ring-white/10 lg:col-span-7 lg:min-h-[420px]">
             <div className="relative z-[2] max-w-xl">
               <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
                 <p className="title-impact shrink-0">Introducing</p>
@@ -85,25 +55,31 @@ export default function Home() {
                   className="hidden h-[2.25rem] w-px shrink-0 bg-gradient-to-b from-transparent via-white/35 to-transparent sm:block"
                   aria-hidden
                 />
-                <p className="text-[11px] font-semibold uppercase leading-snug tracking-[0.26em] text-white/92 [text-shadow:0_2px_20px_rgba(0,0,0,1),0_1px_2px_rgba(0,0,0,.9)] sm:max-w-md">
+                <p className="text-[11px] font-semibold uppercase leading-snug tracking-[0.26em] text-white/85 sm:max-w-md">
                   Ludzy — House &amp; Dance music DJ
                 </p>
               </div>
-              <h1 className="font-display text-4xl font-semibold uppercase leading-[1.05] tracking-[0.06em] text-white [text-shadow:0_4px_32px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.9)] md:text-5xl xl:text-6xl">
+              <h1 className="font-display text-4xl font-semibold uppercase leading-[1.05] tracking-[0.06em] text-white md:text-5xl xl:text-6xl">
                 <span className="text-outline block text-transparent [text-shadow:0_0_0_rgb(255_255_255/0.92)] [-webkit-text-stroke:1px_rgb(255_255_255/0.45)]">
                   Sophisticated
                 </span>
                 <span className="text-outline mt-3 block text-transparent [text-shadow:0_0_0_rgb(255_255_255/0.92)] [-webkit-text-stroke:1px_rgb(255_255_255/0.45)]">
                   Soundscapes
                 </span>
-                <span className="font-script mt-6 block text-3xl font-normal lowercase text-white md:text-4xl [text-shadow:0_3px_24px_rgba(0,0,0,.95)]">
+                <span className="font-script mt-6 block text-3xl font-normal lowercase text-white md:text-4xl">
                   for Social Spaces.
                 </span>
               </h1>
-              <p className="mt-8 max-w-md text-sm leading-relaxed text-white/82 [text-shadow:0_2px_16px_rgba(0,0,0,.95)] md:text-base md:text-white/85">
+              <p className="mt-8 max-w-md text-sm leading-relaxed text-white/75 md:text-base md:text-white/80">
                 Curated music, considered grooves, effortless atmosphere — from laid-back daytime
                 sessions to elegant late-night experiences.
               </p>
+              <a
+                href="#music"
+                className="mt-10 inline-flex w-fit items-center justify-center rounded-full border border-white/35 bg-white/10 px-7 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70"
+              >
+                Learn more
+              </a>
             </div>
             {/* Decorative waveform */}
             <svg
@@ -128,15 +104,8 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-5 lg:col-span-5">
-            {heroPhotos.map((tile) => (
-              <HeroPhotoCard
-                key={tile.title}
-                title={tile.title}
-                caption={tile.caption}
-                src={tile.src}
-                alt={tile.alt}
-                minHeightClass={tile.minHeightClass}
-              />
+            {heroTiles.map((tile) => (
+              <HeroPhotoCard key={tile.title} {...tile} />
             ))}
           </div>
         </section>

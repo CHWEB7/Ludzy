@@ -1,16 +1,19 @@
 import Image from "next/image";
 
-type HeroPhotoCardProps = {
+export type HeroPhotoCardProps = {
   title: string;
   caption?: string;
   /** Portrait-ish thumbnails stack tighter vertically — taller hero stacks welcome */
   minHeightClass?: string;
-  src: string;
+  /** Still image — omit when `videoSrc` is set */
+  src?: string;
+  /** Background video (e.g. `/videos/evening-social.mp4`) — takes precedence over `src` */
+  videoSrc?: string;
   alt: string;
 };
 
 /**
- * Grayscale hero tile with hover “bump” (inner image only — avoids rounding glitches),
+ * Grayscale hero tile (image or looping video) with hover “bump” on media,
  * rotating white/grey surround.
  */
 export function HeroPhotoCard({
@@ -18,16 +21,15 @@ export function HeroPhotoCard({
   caption,
   minHeightClass = "min-h-[180px]",
   src,
+  videoSrc,
   alt,
 }: HeroPhotoCardProps) {
-  /* Fixed outer radius — do not scale the outer shell (safari/gpu used to flicker square corners). */
   const shell = "rounded-[2rem]";
 
   return (
     <div
       className={`group relative isolate flex-1 ${minHeightClass} transform-gpu ${shell}`}
     >
-      {/* Animated surround — clipped to same radius throughout hover */}
       <div
         className={`pointer-events-none absolute inset-0 z-0 overflow-hidden ${shell} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
         aria-hidden
@@ -37,19 +39,32 @@ export function HeroPhotoCard({
         />
       </div>
 
-      {/* Inner tile — bumped scale only on imagery inside overflow-hidden */}
       <div
         className={`absolute inset-[2px] z-[1] overflow-hidden ${shell} border border-white/15 bg-neutral-950 shadow-[0_18px_48px_-24px_rgba(0,0,0,0.95)] ring-1 ring-white/10 transition-[box-shadow,border-color] duration-300 group-hover:border-white/40 group-hover:shadow-[0_22px_60px_-18px_rgba(255,255,255,0.14)]`}
       >
         <div className="absolute inset-0 overflow-hidden">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            sizes="(max-width: 1024px) 100vw, 34vw"
-            className="object-cover grayscale brightness-[0.9] contrast-[1.06] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-[4] motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]"
-            priority
-          />
+          {videoSrc ? (
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={alt}
+              className="absolute inset-0 z-0 h-full w-full scale-105 object-cover grayscale brightness-[0.9] contrast-[1.06] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]"
+            >
+              <source src={videoSrc} type="video/mp4" />
+            </video>
+          ) : src ? (
+            <Image
+              src={src}
+              alt={alt}
+              fill
+              sizes="(max-width: 1024px) 100vw, 34vw"
+              className="object-cover grayscale brightness-[0.9] contrast-[1.06] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-[4] motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]"
+              priority
+            />
+          ) : null}
         </div>
         <div
           className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/72 via-black/25 to-transparent"
