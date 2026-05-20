@@ -92,9 +92,7 @@ export function FloatingHeader() {
                 aria-label="LUDZY home"
               >
                 <SoundBars />
-                <div className="flex-shrink-0 self-end translate-y-[3px] sm:translate-y-1 md:translate-y-[5px]">
-                  <LudzyLogoImage />
-                </div>
+                <LudzyLogoImage />
               </Link>
 
               <div className="flex flex-shrink-0 items-center gap-2 sm:gap-2.5">
