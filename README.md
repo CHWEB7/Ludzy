@@ -25,17 +25,30 @@ Copy `.env.example` to `.env.local` and fill in:
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API → Project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Same page → **anon public** key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Same page → **service_role** secret (server-only; **recommended** for booking) |
 | `NEXT_PUBLIC_SITE_URL` | Your production URL (e.g. `https://your-app.vercel.app`) for metadata |
 
 Never commit `.env.local` or the **service_role** key to Git.
 
-## Supabase setup
+## Supabase setup (booking form)
 
 1. Create a project at [supabase.com](https://supabase.com).  
-2. In the SQL Editor, paste and run `supabase/schema.sql`.  
-3. Optionally add an email/webhook automation from Supabase (e.g. [Database Webhooks](https://supabase.com/docs/guides/database/webhooks)) when new rows arrive in `booking_inquiries`.
+2. In the **SQL Editor**, paste and run **`supabase/schema.sql`** (creates `booking_inquiries` + insert permissions).  
+3. In **Vercel → Project → Settings → Environment Variables**, add the three Supabase vars above for **Production** (and Preview if you test there). **Redeploy** after saving env vars.  
+4. Submit a test enquiry on the live site, then check **Supabase → Table Editor → booking_inquiries**.
 
-The API route `POST /api/booking` inserts using the anon key with an RLS policy that allows **insert only** — rows are not publicly readable.
+The API route `POST /api/booking` prefers **`SUPABASE_SERVICE_ROLE_KEY`** (reliable inserts). Without it, it uses the anon key and requires the RLS policy from `schema.sql`.
+
+### Booking form still failing?
+
+| Symptom | Fix |
+| --- | --- |
+| “Booking is not configured yet” | Add `NEXT_PUBLIC_SUPABASE_URL` and keys in Vercel, redeploy |
+| “Table … is missing” | Run `supabase/schema.sql` in Supabase SQL Editor |
+| “Permission denied” | Re-run `schema.sql`, or add `SUPABASE_SERVICE_ROLE_KEY` in Vercel |
+| Works locally, not on Vercel | Env vars only on Production — add to Preview too, redeploy |
+
+Optionally add [Database Webhooks](https://supabase.com/docs/guides/database/webhooks) or email when new rows arrive.
 
 ## Deploy on Vercel
 

@@ -1,5 +1,4 @@
--- Run this in the Supabase SQL editor (Dashboard → SQL).
--- Adjust types or add columns (e.g. budget, venue_name) as you like.
+-- Run in Supabase → SQL Editor (run the whole script once).
 
 create table if not exists public.booking_inquiries (
   id uuid primary key default gen_random_uuid(),
@@ -14,11 +13,17 @@ create table if not exists public.booking_inquiries (
 
 alter table public.booking_inquiries enable row level security;
 
--- Allow anonymous inserts from the website (anon key, server-side API route).
+-- Allow website/API inserts via anon key (when not using service role on server)
+drop policy if exists "Allow anon insert booking_inquiries" on public.booking_inquiries;
+
 create policy "Allow anon insert booking_inquiries"
   on public.booking_inquiries
   for insert
   to anon
   with check (true);
 
--- No public reads — view rows only from the Supabase Dashboard or a future admin UI.
+-- Explicit grants (some projects need these for anon inserts)
+grant usage on schema public to anon, authenticated, service_role;
+grant insert on table public.booking_inquiries to anon, service_role;
+
+-- View rows in Dashboard → Table Editor, or use service_role / authenticated policies later.

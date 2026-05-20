@@ -11,8 +11,16 @@ export function BookingForm() {
     setStatus("sending");
     setMessage("");
 
-    const form = new FormData(ev.currentTarget);
-    const payload = Object.fromEntries(form.entries());
+    const form = ev.currentTarget;
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get("name") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      phone: String(formData.get("phone") ?? ""),
+      event_type: String(formData.get("event_type") ?? ""),
+      event_date: String(formData.get("event_date") ?? ""),
+      message: String(formData.get("message") ?? ""),
+    };
 
     try {
       const res = await fetch("/api/booking", {
@@ -21,17 +29,22 @@ export function BookingForm() {
         body: JSON.stringify(payload),
       });
 
+      const data = (await res.json().catch(() => ({}))) as { error?: string; ok?: boolean };
+
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.error || "Could not submit");
+        throw new Error(data.error || `Request failed (${res.status})`);
       }
 
       setStatus("ok");
-      setMessage("Thank you — enquiry received.");
-      ev.currentTarget.reset();
-    } catch {
+      setMessage("Thank you — enquiry received. We'll be in touch soon.");
+      form.reset();
+    } catch (err) {
       setStatus("err");
-      setMessage("Something went wrong. Please call or email directly.");
+      const text =
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please call or email directly.";
+      setMessage(text);
     }
   }
 
@@ -46,6 +59,7 @@ export function BookingForm() {
           <input
             name="name"
             required
+            autoComplete="name"
             className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
             placeholder="Your name"
           />
@@ -56,6 +70,7 @@ export function BookingForm() {
             name="email"
             type="email"
             required
+            autoComplete="email"
             className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
             placeholder="you@example.com"
           />
@@ -67,6 +82,8 @@ export function BookingForm() {
           Phone
           <input
             name="phone"
+            type="tel"
+            autoComplete="tel"
             className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
             placeholder="Optional"
           />
@@ -86,6 +103,7 @@ export function BookingForm() {
             <option value="resident">The Resident</option>
             <option value="corporate">The Corporate</option>
             <option value="terrace">The Terrace Session</option>
+            <option value="garden">Garden parties</option>
             <option value="other">Other</option>
           </select>
         </label>
@@ -121,7 +139,7 @@ export function BookingForm() {
 
       {message && (
         <p
-          className={`text-center text-sm ${
+          className={`text-center text-sm leading-relaxed ${
             status === "ok" ? "text-emerald-300" : "text-rose-300"
           }`}
           role="status"
