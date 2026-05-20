@@ -28,10 +28,10 @@ export function HeroPhotoCard({
   alt,
 }: HeroPhotoCardProps) {
   const shell = "rounded-[2rem]";
-  const videoSources =
-    videoSourcesProp?.length ?? 0
+  const videoSources: string[] =
+    videoSourcesProp != null && videoSourcesProp.length > 0
       ? videoSourcesProp
-      : videoSrc
+      : videoSrc != null && videoSrc.length > 0
         ? [videoSrc]
         : [];
 
