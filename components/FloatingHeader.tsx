@@ -1,16 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useState } from "react";
+import { scrollToSection } from "@/lib/scroll-to-section";
 import { LudzyLogoImage } from "./LudzyLogoImage";
 import { SoundBars } from "./SoundBars";
 
 const navItems = [
-  { href: "/#music", label: "Sound" },
+  { href: "/#music", sectionId: "music", label: "Sound" },
   { href: "/events", label: "Events" },
-  { href: "/#services", label: "Services" },
-  { href: "/#mission", label: "Story" },
-  { href: "/#book", label: "Book" },
+  { href: "/#services", sectionId: "services", label: "Services" },
+  { href: "/#philosophy", sectionId: "philosophy", label: "Philosophy" },
+  { href: "/#enquire", sectionId: "enquire", label: "Enquire" },
 ] as const;
 
 const shellOuter = "rounded-[2rem]";
@@ -39,9 +41,26 @@ function HamburgerGlyph({ open }: { open: boolean }) {
 }
 
 export function FloatingHeader() {
+  const pathname = usePathname();
+  const router = useRouter();
   const [fade, setFade] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const drawerId = useId();
+
+  const handleSectionNav = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string | undefined,
+  ) => {
+    setMenuOpen(false);
+    if (!sectionId) return;
+    e.preventDefault();
+    if (pathname === "/") {
+      scrollToSection(sectionId);
+      window.history.replaceState(null, "", `/#${sectionId}`);
+      return;
+    }
+    router.push(`/#${sectionId}`);
+  };
 
   useEffect(() => {
     const maxScroll = 260;
@@ -64,6 +83,21 @@ export function FloatingHeader() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (pathname !== "/") return;
+
+    const scrollFromHash = (behavior: ScrollBehavior = "auto") => {
+      const hash = window.location.hash.replace("#", "");
+      if (!hash) return;
+      window.setTimeout(() => scrollToSection(hash, behavior), 80);
+    };
+
+    scrollFromHash();
+    const onHashChange = () => scrollFromHash("smooth");
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [pathname]);
 
   const barOpacity = useMemo(() => 1 - fade, [fade]);
 
@@ -98,8 +132,8 @@ export function FloatingHeader() {
 
               <div className="flex flex-shrink-0 items-center gap-2 sm:gap-2.5">
                 <Link
-                  href="/#book"
-                  onClick={() => setMenuOpen(false)}
+                  href="/#enquire"
+                  onClick={(e) => handleSectionNav(e, "enquire")}
                   className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white hover:bg-white hover:text-black"
                 >
                   Enquire
@@ -133,7 +167,11 @@ export function FloatingHeader() {
                       <li key={item.href}>
                         <Link
                           href={item.href}
-                          onClick={() => setMenuOpen(false)}
+                          onClick={(e) =>
+                            "sectionId" in item && item.sectionId
+                              ? handleSectionNav(e, item.sectionId)
+                              : setMenuOpen(false)
+                          }
                           className="block rounded-xl px-3 py-3 text-sm font-semibold uppercase tracking-[0.22em] text-white/75 transition hover:bg-white/10 hover:text-white"
                         >
                           {item.label}

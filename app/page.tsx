@@ -1,7 +1,10 @@
 import { BookingForm } from "@/components/BookingForm";
 import { HeroPhotoCard, type HeroPhotoCardProps } from "@/components/HeroPhotoCard";
+import { InstagramCard } from "@/components/InstagramCard";
 import { MixcloudEmbed } from "@/components/MixcloudEmbed";
 import { ServiceGrid } from "@/components/ServiceGrid";
+import { SectionLink } from "@/components/SectionLink";
+import { SocialLinks } from "@/components/SocialLinks";
 
 const mixcloudShows = [
   {
@@ -100,12 +103,13 @@ export default function Home() {
                 Curated music, considered grooves, effortless atmosphere — from laid-back daytime
                 sessions to elegant late-night experiences.
               </p>
-              <a
+              <SectionLink
+                sectionId="music"
                 href="#music"
                 className="mt-10 inline-flex w-fit items-center justify-center rounded-full border border-white/35 bg-white/10 px-7 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-white backdrop-blur-sm transition hover:border-white hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/70"
               >
                 Learn more
-              </a>
+              </SectionLink>
             </div>
             {/* Decorative waveform */}
             <svg
@@ -137,7 +141,7 @@ export default function Home() {
         </section>
 
         {/* Music */}
-        <section id="music" className="mt-20 lg:mt-28">
+        <section id="music" className="scroll-section mt-20 lg:mt-28">
           <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="title-impact">The sound</p>
@@ -205,17 +209,12 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <div className="glass-panel flex flex-col justify-between rounded-3xl p-8">
-              <p className="title-impact">Promise</p>
-              <p className="mt-6 font-script text-2xl text-white/90">
-                Effortless atmosphere — you stay in the moment.
-              </p>
-            </div>
+            <InstagramCard />
           </div>
         </section>
 
         {/* Services */}
-        <section className="mt-20 lg:mt-28">
+        <section id="services" className="scroll-section mt-20 lg:mt-28">
           <div className="mb-12 max-w-2xl">
             <p className="title-impact">Services</p>
             <h2 className="mt-4 font-display text-2xl font-semibold uppercase tracking-[0.2em] text-white md:text-3xl">
@@ -229,12 +228,9 @@ export default function Home() {
           <ServiceGrid />
         </section>
 
-        {/* Mission + book */}
-        <section
-          id="mission"
-          className="mt-20 grid gap-10 rounded-[2rem] border border-white/12 bg-black/65 p-10 backdrop-blur lg:mt-28 lg:grid-cols-2 lg:gap-14 lg:p-14"
-        >
-          <div>
+        {/* Philosophy + enquire */}
+        <section className="mt-20 grid gap-10 rounded-[2rem] border border-white/12 bg-black/65 p-10 backdrop-blur lg:mt-28 lg:grid-cols-2 lg:gap-14 lg:p-14">
+          <div id="philosophy" className="scroll-section">
             <p className="title-impact">Philosophy</p>
             <h2 className="mt-5 font-display text-2xl font-semibold uppercase leading-snug tracking-[0.16em] text-white md:text-3xl">
               Timeless.
@@ -256,31 +252,12 @@ export default function Home() {
               <p className="mb-4 text-[11px] leading-relaxed text-white/45">
                 Sets, previews, and behind-the-scenes.
               </p>
-              <a
-                href="https://www.instagram.com/dj_ludzy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white/80 ring-1 ring-white/5 transition hover:border-[#f69845]/50 hover:bg-white/[0.07] hover:text-white hover:shadow-[0_0_24px_-4px_rgba(164,100,230,0.35)]"
-              >
-                <svg
-                  className="h-[22px] w-[22px] shrink-0 text-white/65 transition group-hover:text-[#f69845]"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  xmlns="http://www.w3.org/2000/svg"
-                  aria-hidden
-                >
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 11-2.881 0 1.44 1.44 0 012.881 0z" />
-                </svg>
-                <span>
-                  <span className="sr-only">Instagram — </span>
-                  <span className="font-semibold tracking-[0.12em]">@dj_ludzy</span>
-                </span>
-              </a>
+              <SocialLinks />
             </div>
           </div>
 
-          <div id="book" className="scroll-mt-28">
-            <p className="title-impact mb-6">Booking</p>
+          <div id="enquire" className="scroll-section">
+            <p className="title-impact mb-6">Enquire</p>
             <h3 className="font-display text-xl font-semibold uppercase tracking-[0.22em] text-white md:text-2xl">
               Let&apos;s create something memorable
             </h3>
@@ -321,13 +298,6 @@ export default function Home() {
           </p>
           <p className="font-script mt-4 text-2xl text-white/85">
             LUDZY — DJ for refined social spaces
-          </p>
-          <p className="mx-auto mt-8 max-w-md text-[11px] leading-relaxed text-white/35">
-            Replace placeholder photography with your flyer assets via{" "}
-            <code className="rounded bg-white/5 px-1 py-0.5 text-[10px] text-white/50">
-              public/images
-            </code>{" "}
-            — see README.
           </p>
         </footer>
       </div>

@@ -46,10 +46,7 @@ export function ServiceGrid() {
 
   return (
     <>
-      <div
-        id="services"
-        className="grid gap-5 md:grid-cols-2 xl:grid-cols-4"
-      >
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
         {services.map((s) => (
           <button
             key={s.id}
@@ -107,7 +104,7 @@ export function ServiceGrid() {
             </p>
             <div className="mt-8 flex justify-center">
               <a
-                href="#book"
+                href="#enquire"
                 onClick={() => setActive(null)}
                 className="rounded-full bg-white px-6 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-black transition hover:bg-white/85"
               >
