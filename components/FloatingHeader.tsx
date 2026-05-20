@@ -6,10 +6,11 @@ import { LudzyLogoImage } from "./LudzyLogoImage";
 import { SoundBars } from "./SoundBars";
 
 const navItems = [
-  { href: "#music", label: "Sound" },
-  { href: "#services", label: "Services" },
-  { href: "#mission", label: "Story" },
-  { href: "#book", label: "Book" },
+  { href: "/#music", label: "Sound" },
+  { href: "/events", label: "Events" },
+  { href: "/#services", label: "Services" },
+  { href: "/#mission", label: "Story" },
+  { href: "/#book", label: "Book" },
 ] as const;
 
 const shellOuter = "rounded-[2rem]";
@@ -87,7 +88,7 @@ export function FloatingHeader() {
           >
             <div className="flex items-end justify-between gap-3 px-4 py-3 md:gap-6 md:px-6 md:py-3.5">
               <Link
-                href="#top"
+                href="/"
                 className="ludzy-brand-lockup group flex shrink-0 cursor-pointer items-end gap-2 sm:gap-2.5 md:gap-3"
                 aria-label="LUDZY home"
               >
@@ -97,7 +98,7 @@ export function FloatingHeader() {
 
               <div className="flex flex-shrink-0 items-center gap-2 sm:gap-2.5">
                 <Link
-                  href="#book"
+                  href="/#book"
                   onClick={() => setMenuOpen(false)}
                   className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white transition hover:border-white hover:bg-white hover:text-black"
                 >

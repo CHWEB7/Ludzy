@@ -18,6 +18,26 @@ body {
   @apply border border-white/10 bg-black/50 backdrop-blur-md;
 }
 
+/* Events page — horizontal swipe carousels */
+.events-carousel-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.events-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.events-carousel-track {
+  scroll-padding-inline: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .events-carousel-track {
+    scroll-padding-inline: 0;
+  }
+}
+
 /* Header lockup — wide PNG is sized by WIDTH so flex shrink cannot squash it */
 .ludzy-brand-lockup {
   flex-shrink: 0 !important;
