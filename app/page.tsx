@@ -5,9 +5,10 @@ import { ServiceGrid } from "@/components/ServiceGrid";
 const heroPhotos = [
   {
     title: "Evening social",
-    caption: "String lights & laughter",
-    src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=75",
-    alt: "Black and white photo of an outdoor evening gathering with string lights",
+    caption: "Smoke, rim light & groove",
+    /* DJ silhouette / mixer — grayscale applied in-card; swap to /images/evening-social.jpg if you upload the exact flyer photo */
+    src: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=1400&q=80",
+    alt: "Greyscale DJ performance with hands at the mixer and stage haze",
     minHeightClass: "min-h-[188px]",
   },
   {
