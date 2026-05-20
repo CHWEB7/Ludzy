@@ -13,6 +13,8 @@ export type HeroPhotoCardProps = {
   videoSources?: string[];
   /** Image/video treatment: `lowKey` = darker greyscale (match festival tile weight) */
   mediaTone?: "balanced" | "lowKey";
+  /** Bypass Next optimizer for hosts that block server-side fetch (some CDNs) */
+  imageUnoptimized?: boolean;
   alt: string;
 };
 
@@ -29,6 +31,7 @@ export function HeroPhotoCard({
   videoSources: videoSourcesProp,
   alt,
   mediaTone = "balanced",
+  imageUnoptimized = false,
 }: HeroPhotoCardProps) {
   const shell = "rounded-[2rem]";
   const mediaFilter =
@@ -81,6 +84,7 @@ export function HeroPhotoCard({
               sizes="(max-width: 1024px) 100vw, 34vw"
               className={`object-cover ${mediaFilter} transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-[4] motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]`}
               priority
+              unoptimized={imageUnoptimized}
             />
           ) : null}
         </div>

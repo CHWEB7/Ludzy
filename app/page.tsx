@@ -12,6 +12,10 @@ const PEXELS_MIXER_MP4_PRIMARY =
 const PEXELS_MIXER_MP4_HD =
   "https://videos.pexels.com/video-files/9003937/9003937-hd_1920_1080_25fps.mp4";
 
+/** Pexels — Luca Luperto, outdoor / lakeside DJ (allow direct CDN in browser via unoptimized Image) */
+const PEXELS_GARDEN_PARTY_DJ =
+  "https://images.pexels.com/photos/13902049/pexels-photo-13902049.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600";
+
 const heroTiles: HeroPhotoCardProps[] = [
   {
     title: "Evening social",
@@ -25,12 +29,13 @@ const heroTiles: HeroPhotoCardProps[] = [
     minHeightClass: "min-h-[200px]",
   },
   {
-    title: "House music",
-    caption: "Booth-lit grooves & velvet low-end",
-    src: "https://images.unsplash.com/photo-1571266025683-ea3b5b0ab4ff?ixlib=rb-4.1.0&auto=format&fit=crop&w=1400&q=82",
-    alt: "Greyscale DJ turntables and mixer in a dim club",
+    title: "Garden parties",
+    caption: "Open-air by the water, dusk & dance floors",
+    src: PEXELS_GARDEN_PARTY_DJ,
+    alt: "Outdoor lakeside party at sunset with a DJ (Photo by Luca Luperto on Pexels)",
     minHeightClass: "min-h-[208px]",
     mediaTone: "lowKey",
+    imageUnoptimized: true,
   },
   {
     title: "Dance music",
