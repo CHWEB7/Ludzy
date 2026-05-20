@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { LudzyWordmark } from "./LudzyWordmark";
 import { SoundBars } from "./SoundBars";
 
 const navItems = [
@@ -44,10 +45,10 @@ export function FloatingHeader() {
           aria-label="LUDZY home"
         >
           <SoundBars />
-          <div className="flex flex-col leading-none">
-            <span className="font-display text-lg font-semibold uppercase tracking-[0.35em] text-white outline-1 outline-white/70">
-              ludzy
-            </span>
+          <div className="flex min-w-0 flex-col leading-none">
+            <div className="w-[148px] shrink-0 md:w-[178px]">
+              <LudzyWordmark className="h-[38px] w-full md:h-[42px]" />
+            </div>
             <span className="mt-1 text-[10px] font-medium uppercase tracking-[0.28em] text-white/55">
               house &amp; dance music
             </span>

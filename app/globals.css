@@ -21,30 +21,3 @@ body {
 .section-title {
   @apply font-display text-xs font-semibold uppercase tracking-[0.35em] text-white/55;
 }
-
-/* Subtle vignette overlays for bento placeholders */
-.hero-bokeh {
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.12), transparent 45%),
-    radial-gradient(circle at 85% 10%, rgba(255, 255, 255, 0.12), transparent 40%),
-    linear-gradient(135deg, #0a0a0a 0%, #171717 42%, #0a0a0a 100%);
-}
-
-.hero-kit {
-  background:
-    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.08), transparent 50%),
-    repeating-linear-gradient(
-      90deg,
-      rgba(255, 255, 255, 0.04) 0,
-      rgba(255, 255, 255, 0.04) 1px,
-      transparent 1px,
-      transparent 18px
-    ),
-    #0c0c0c;
-}
-
-.hero-lounge {
-  background:
-    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.06), transparent 55%),
-    linear-gradient(180deg, #111 0%, #070707 100%);
-}

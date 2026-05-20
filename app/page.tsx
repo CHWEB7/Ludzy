@@ -1,5 +1,30 @@
 import { BookingForm } from "@/components/BookingForm";
+import { HeroPhotoCard } from "@/components/HeroPhotoCard";
 import { ServiceGrid } from "@/components/ServiceGrid";
+
+const heroPhotos = [
+  {
+    title: "Evening social",
+    caption: "String lights & laughter",
+    src: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=75",
+    alt: "Black and white photo of an outdoor evening gathering with string lights",
+    minHeightClass: "min-h-[188px]",
+  },
+  {
+    title: "In the booth",
+    caption: "Hands on the mix",
+    src: "https://images.unsplash.com/photo-1470225627910-9fb66461bbfe?auto=format&fit=crop&w=1200&q=75",
+    alt: "Monochrome close-up of DJ turntables and mixer in low light",
+    minHeightClass: "min-h-[208px]",
+  },
+  {
+    title: "Lounge vignette",
+    caption: "Low light, soft seats",
+    src: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=75",
+    alt: "Greyscale interior of a dim lounge with sofas",
+    minHeightClass: "min-h-[148px]",
+  },
+] as const;
 
 export default function Home() {
   return (
@@ -60,28 +85,16 @@ export default function Home() {
           </div>
 
           <div className="flex flex-col gap-5 lg:col-span-5">
-            <div className="hero-bokeh relative min-h-[180px] flex-1 overflow-hidden rounded-[2rem] border border-white/15">
-              <span className="absolute left-6 top-6 rounded-full bg-black/55 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/65 backdrop-blur">
-                Evening social
-              </span>
-              <span className="absolute bottom-6 right-6 text-[10px] uppercase tracking-[0.28em] text-white/55">
-                Bokeh &amp; light
-              </span>
-            </div>
-            <div className="hero-kit relative min-h-[200px] flex-1 overflow-hidden rounded-[2rem] border border-white/15">
-              <span className="absolute left-6 top-6 rounded-full bg-black/55 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/65 backdrop-blur">
-                In the booth
-              </span>
-              <div className="absolute bottom-5 left-1/2 h-28 w-[78%] -translate-x-1/2 rounded-2xl border border-white/10 bg-black/65 shadow-[inset_0_0_40px_rgba(255,255,255,0.04)] backdrop-blur" />
-              <span className="absolute bottom-4 right-5 text-[10px] uppercase tracking-[0.28em] text-white/45">
-                Replace with venue photo
-              </span>
-            </div>
-            <div className="hero-lounge relative min-h-[140px] overflow-hidden rounded-[2rem] border border-white/15">
-              <span className="absolute left-6 top-6 rounded-full bg-black/55 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/65 backdrop-blur">
-                Lounge vignette
-              </span>
-            </div>
+            {heroPhotos.map((tile) => (
+              <HeroPhotoCard
+                key={tile.title}
+                title={tile.title}
+                caption={tile.caption}
+                src={tile.src}
+                alt={tile.alt}
+                minHeightClass={tile.minHeightClass}
+              />
+            ))}
           </div>
         </section>
 
