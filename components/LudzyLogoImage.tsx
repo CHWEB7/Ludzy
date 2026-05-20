@@ -2,22 +2,18 @@ import Image from "next/image";
 import ludzyLogo from "@/public/images/ludzy-logo.png";
 
 /**
- * Logo is bundled at build time from public/images/ludzy-logo.png.
- * NOT stored in Supabase — must be committed to Git so Vercel can build it in.
+ * Wide wordmark — bottom-aligned with SoundBars (parent `items-end`).
  */
 export function LudzyLogoImage({ className = "" }: { className?: string }) {
   return (
-    <div
-      className={`relative flex h-12 shrink-0 items-end overflow-visible ${className}`}
-    >
+    <div className={`flex shrink-0 items-end ${className}`}>
       <Image
         src={ludzyLogo}
         alt="LUDZY"
-        width={320}
-        height={64}
+        width={420}
+        height={84}
         priority
-        className="block h-12 w-auto max-w-[min(300px,48vw)] object-contain object-left-bottom mix-blend-screen"
-        style={{ width: "auto", maxHeight: "3rem" }}
+        className="block h-12 w-auto max-w-[min(252px,54vw)] object-contain object-left-bottom mix-blend-screen sm:max-w-[min(288px,50vw)] md:h-14 md:max-w-[min(328px,36vw)]"
       />
     </div>
   );

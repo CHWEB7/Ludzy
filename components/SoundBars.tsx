@@ -4,7 +4,7 @@ const heights = ["h-6", "h-10", "h-4", "h-12", "h-7", "h-9", "h-5"];
 
 export function SoundBars() {
   return (
-    <div className="flex h-12 items-end gap-1" aria-hidden>
+    <div className="flex h-12 shrink-0 items-end gap-[3px] pb-px" aria-hidden>
       {heights.map((h, i) => (
         <span
           key={i}
