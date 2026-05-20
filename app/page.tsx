@@ -1,6 +1,11 @@
+import Image from "next/image";
 import { BookingForm } from "@/components/BookingForm";
 import { HeroPhotoCard } from "@/components/HeroPhotoCard";
 import { ServiceGrid } from "@/components/ServiceGrid";
+
+/** Swap to `/images/hero-light-trails.jpg` for your own long-exposure light-trails photo */
+const heroMainTextureSrc =
+  "https://images.unsplash.com/photo-1544984241-ec57ea16fe25?auto=format&fit=crop&w=2000&q=85";
 
 const heroPhotos = [
   {
@@ -44,28 +49,61 @@ export default function Home() {
       <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-8 md:px-10 md:pt-10">
         {/* Hero — bento */}
         <section className="grid gap-5 lg:grid-cols-12 lg:gap-6">
-          <div className="glass-panel relative flex flex-col overflow-hidden rounded-[2rem] p-8 lg:col-span-7 lg:min-h-[420px]">
-            <div className="relative z-[1] max-w-xl">
-              <p className="section-title mb-6">Introducing</p>
-              <h1 className="font-display text-4xl font-semibold uppercase leading-[1.05] tracking-[0.06em] text-white md:text-5xl xl:text-6xl">
+          <div className="relative flex flex-col overflow-hidden rounded-[2rem] border border-white/15 bg-neutral-950/40 p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] lg:col-span-7 lg:min-h-[420px]">
+            {/* Background — monochrome energy, black toward top for typography */}
+            <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-[inherit]">
+              <Image
+                src={heroMainTextureSrc}
+                alt=""
+                aria-hidden
+                fill
+                className="scale-105 object-cover object-center grayscale-[0.92] brightness-[0.85] contrast-[1.08] saturate-0"
+                sizes="(max-width: 1024px) 100vw, 66vw"
+                priority
+              />
+              {/* Black falloff at top */}
+              <div
+                className="absolute inset-0 bg-[linear-gradient(to_bottom,_rgba(0,0,0,1)_0%,_rgba(0,0,0,0.88)_18%,_rgba(0,0,0,0.45)_45%,_rgba(0,0,0,0.12)_68%,_transparent_100%)]"
+                aria-hidden
+              />
+              {/* Readability: soft side vignettes */}
+              <div
+                className="absolute inset-0 bg-[radial-gradient(ellipse_at_120%_-10%,transparent_52%,rgba(0,0,0,0.55)_96%)]"
+                aria-hidden
+              />
+              <div className="absolute inset-0 bg-black/35" aria-hidden />
+            </div>
+
+            <div className="relative z-[2] max-w-xl">
+              <div className="mb-7 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+                <p className="title-impact shrink-0">Introducing</p>
+                <span
+                  className="hidden h-[2.25rem] w-px shrink-0 bg-gradient-to-b from-transparent via-white/35 to-transparent sm:block"
+                  aria-hidden
+                />
+                <p className="text-[11px] font-semibold uppercase leading-snug tracking-[0.26em] text-white/92 [text-shadow:0_2px_20px_rgba(0,0,0,1),0_1px_2px_rgba(0,0,0,.9)] sm:max-w-md">
+                  Ludzy — House &amp; Dance music DJ
+                </p>
+              </div>
+              <h1 className="font-display text-4xl font-semibold uppercase leading-[1.05] tracking-[0.06em] text-white [text-shadow:0_4px_32px_rgba(0,0,0,1),0_2px_6px_rgba(0,0,0,.9)] md:text-5xl xl:text-6xl">
                 <span className="text-outline block text-transparent [text-shadow:0_0_0_rgb(255_255_255/0.92)] [-webkit-text-stroke:1px_rgb(255_255_255/0.45)]">
                   Sophisticated
                 </span>
-                <span className="block text-outline mt-3 text-transparent [text-shadow:0_0_0_rgb(255_255_255/0.92)] [-webkit-text-stroke:1px_rgb(255_255_255/0.45)]">
+                <span className="text-outline mt-3 block text-transparent [text-shadow:0_0_0_rgb(255_255_255/0.92)] [-webkit-text-stroke:1px_rgb(255_255_255/0.45)]">
                   Soundscapes
                 </span>
-                <span className="font-script mt-6 block text-3xl font-normal lowercase text-white md:text-4xl">
+                <span className="font-script mt-6 block text-3xl font-normal lowercase text-white md:text-4xl [text-shadow:0_3px_24px_rgba(0,0,0,.95)]">
                   for Social Spaces.
                 </span>
               </h1>
-              <p className="mt-8 max-w-md text-sm leading-relaxed text-white/65 md:text-base">
+              <p className="mt-8 max-w-md text-sm leading-relaxed text-white/82 [text-shadow:0_2px_16px_rgba(0,0,0,.95)] md:text-base md:text-white/85">
                 Curated music, considered grooves, effortless atmosphere — from laid-back daytime
                 sessions to elegant late-night experiences.
               </p>
             </div>
             {/* Decorative waveform */}
             <svg
-              className="pointer-events-none absolute bottom-10 right-6 w-56 opacity-[0.12] lg:w-72"
+              className="pointer-events-none absolute bottom-10 right-6 z-[1] w-56 opacity-[0.14] lg:w-72"
               viewBox="0 0 420 120"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +141,7 @@ export default function Home() {
         <section id="music" className="mt-20 lg:mt-28">
           <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="section-title">The sound</p>
+              <p className="title-impact">The sound</p>
               <h2 className="mt-4 font-display text-2xl font-semibold uppercase tracking-[0.2em] text-white md:text-3xl">
                 Low-slung, soulful, organic
               </h2>
@@ -136,9 +174,7 @@ export default function Home() {
                   </svg>
                 </div>
                 <div>
-                  <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-white/45">
-                    On rotation
-                  </p>
+                  <p className="title-impact">On rotation</p>
                   <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/75 md:text-base">
                     Playing low slung bass lines, soulful edits, organic house and rare groove.
                   </p>
@@ -146,9 +182,7 @@ export default function Home() {
               </div>
             </div>
             <div className="glass-panel flex flex-col justify-between rounded-3xl p-8">
-              <p className="font-display text-xs font-semibold uppercase tracking-[0.3em] text-white/45">
-                Promise
-              </p>
+              <p className="title-impact">Promise</p>
               <p className="mt-6 font-script text-2xl text-white/90">
                 Effortless atmosphere — you stay in the moment.
               </p>
@@ -159,7 +193,7 @@ export default function Home() {
         {/* Services */}
         <section className="mt-20 lg:mt-28">
           <div className="mb-12 max-w-2xl">
-            <p className="section-title">Services</p>
+            <p className="title-impact">Services</p>
             <h2 className="mt-4 font-display text-2xl font-semibold uppercase tracking-[0.2em] text-white md:text-3xl">
               Four ways we set the room
             </h2>
@@ -177,7 +211,7 @@ export default function Home() {
           className="mt-20 grid gap-10 rounded-[2rem] border border-white/12 bg-black/65 p-10 backdrop-blur lg:mt-28 lg:grid-cols-2 lg:gap-14 lg:p-14"
         >
           <div>
-            <p className="section-title">Philosophy</p>
+            <p className="title-impact">Philosophy</p>
             <h2 className="mt-5 font-display text-2xl font-semibold uppercase leading-snug tracking-[0.16em] text-white md:text-3xl">
               Timeless.
               <br />
@@ -195,7 +229,7 @@ export default function Home() {
           </div>
 
           <div id="book" className="scroll-mt-28">
-            <p className="section-title mb-6">Booking</p>
+            <p className="title-impact mb-6">Booking</p>
             <h3 className="font-display text-xl font-semibold uppercase tracking-[0.22em] text-white md:text-2xl">
               Let&apos;s create something memorable
             </h3>

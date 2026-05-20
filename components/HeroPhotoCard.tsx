@@ -55,8 +55,8 @@ export function HeroPhotoCard({
           className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/72 via-black/25 to-transparent"
           aria-hidden
         />
-        <span className="absolute left-5 top-5 z-[2] rounded-full bg-black/55 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/75 backdrop-blur-md">
-          {title}
+        <span className="absolute left-5 top-5 z-[2] rounded-full bg-black/60 px-3 py-1.5 backdrop-blur-md ring-1 ring-white/15">
+          <span className="title-impact-sm">{title}</span>
         </span>
         {caption ? (
           <span className="absolute bottom-5 right-5 z-[2] max-w-[55%] text-right text-[10px] uppercase leading-relaxed tracking-[0.28em] text-white/55">

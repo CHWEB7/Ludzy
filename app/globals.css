@@ -18,6 +18,13 @@ body {
   @apply border border-white/10 bg-black/50 backdrop-blur-md;
 }
 
-.section-title {
-  @apply font-display text-xs font-semibold uppercase tracking-[0.35em] text-white/55;
+@layer components {
+  /* Metallic gradient eyebrows — readability via drop shadow on wrapper */
+  .title-impact {
+    @apply inline-block bg-gradient-to-br from-white via-zinc-200 to-neutral-500 bg-clip-text font-display text-xs font-semibold uppercase tracking-[0.35em] text-transparent drop-shadow-[0_2px_14px_rgba(0,0,0,0.9)];
+  }
+
+  .title-impact-sm {
+    @apply inline-block bg-gradient-to-r from-white via-zinc-200 to-neutral-400 bg-clip-text font-display text-[10px] font-semibold uppercase tracking-[0.28em] text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.95)];
+  }
 }
