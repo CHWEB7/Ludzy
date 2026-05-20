@@ -41,7 +41,7 @@ export default function Home() {
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-32 md:px-10 md:pt-36">
+      <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-8 md:px-10 md:pt-10">
         {/* Hero — bento */}
         <section className="grid gap-5 lg:grid-cols-12 lg:gap-6">
           <div className="glass-panel relative flex flex-col overflow-hidden rounded-[2rem] p-8 lg:col-span-7 lg:min-h-[420px]">
@@ -194,7 +194,7 @@ export default function Home() {
             </blockquote>
           </div>
 
-          <div id="book" className="scroll-mt-36">
+          <div id="book" className="scroll-mt-28">
             <p className="section-title mb-6">Booking</p>
             <h3 className="font-display text-xl font-semibold uppercase tracking-[0.22em] text-white md:text-2xl">
               Let&apos;s create something memorable
