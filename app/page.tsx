@@ -3,8 +3,18 @@ import { HeroPhotoCard, type HeroPhotoCardProps } from "@/components/HeroPhotoCa
 import { MixcloudEmbed } from "@/components/MixcloudEmbed";
 import { ServiceGrid } from "@/components/ServiceGrid";
 
-const MIXCLOUD_CHILLED_IBIZA =
-  "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/";
+const mixcloudShows = [
+  {
+    label: "Chilled Ibiza",
+    url: "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/",
+    embedTitle: "DJ Ludzy — Chilled Ibiza mix on Mixcloud",
+  },
+  {
+    label: "UK Garage — Thursday Night Live",
+    url: "https://www.mixcloud.com/DJ-Ludzy/uk-garage-thursday-night-live-with-ludzy-20260514-185716/",
+    embedTitle: "DJ Ludzy — UK Garage Thursday Night Live on Mixcloud",
+  },
+] as const;
 
 /** Pexels: close-up footage of a person using sound mixer (Yan Krukau) — CDN file names differ from generic guesses */
 const PEXELS_MIXER_MP4_PRIMARY =
@@ -170,25 +180,29 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-8 space-y-3">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
-                  Now playing · Chilled Ibiza — DJ Ludzy
-                </p>
-                <MixcloudEmbed
-                  mixUrl={MIXCLOUD_CHILLED_IBIZA}
-                  title="DJ Ludzy — Chilled Ibiza mix on Mixcloud"
-                  height={120}
-                />
-                <p className="text-[11px] text-white/35">
-                  <a
-                    href={MIXCLOUD_CHILLED_IBIZA}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline decoration-white/20 underline-offset-2 transition hover:text-white/55"
-                  >
-                    Open on Mixcloud
-                  </a>
-                </p>
+              <div className="mt-8 space-y-10">
+                {mixcloudShows.map((show) => (
+                  <div key={show.url} className="space-y-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                      {show.label} — DJ Ludzy
+                    </p>
+                    <MixcloudEmbed
+                      mixUrl={show.url}
+                      title={show.embedTitle}
+                      height={120}
+                    />
+                    <p className="text-[11px] text-white/35">
+                      <a
+                        href={show.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline decoration-white/20 underline-offset-2 transition hover:text-white/55"
+                      >
+                        Open on Mixcloud
+                      </a>
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
             <div className="glass-panel flex flex-col justify-between rounded-3xl p-8">
