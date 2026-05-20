@@ -26,9 +26,9 @@ const heroTiles: HeroPhotoCardProps[] = [
   },
   {
     title: "House music",
-    caption: "Dim rooms, soft smoke & rolling low-end",
-    src: "https://images.unsplash.com/photo-1514525593451-8431f16da00d?auto=format&fit=crop&w=1400&q=82",
-    alt: "Greyscale nightclub scene with DJ booth, lights and crowd silhouettes",
+    caption: "Booth-lit grooves & velvet low-end",
+    src: "https://images.unsplash.com/photo-1571266025683-ea3b5b0ab4ff?ixlib=rb-4.1.0&auto=format&fit=crop&w=1400&q=82",
+    alt: "Greyscale DJ turntables and mixer in a dim club",
     minHeightClass: "min-h-[208px]",
     mediaTone: "lowKey",
   },

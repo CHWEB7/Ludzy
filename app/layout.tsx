@@ -23,6 +23,10 @@ export const metadata: Metadata = {
   title: "LUDZY | Sophisticated soundscapes",
   description:
     "HOUSE & dance music DJ — curated selections for gatherings, residences, corporates & terrace sessions.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
   openGraph: {
     title: "LUDZY — Sophisticated soundscapes",
     description:
