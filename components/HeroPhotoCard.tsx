@@ -11,6 +11,8 @@ export type HeroPhotoCardProps = {
   videoSrc?: string;
   /** Multiple MP4 sources (order = browser fallback). Use Pexels `videos.pexels.com` URLs + optional local file. */
   videoSources?: string[];
+  /** Image/video treatment: `lowKey` = darker greyscale (match festival tile weight) */
+  mediaTone?: "balanced" | "lowKey";
   alt: string;
 };
 
@@ -26,8 +28,13 @@ export function HeroPhotoCard({
   videoSrc,
   videoSources: videoSourcesProp,
   alt,
+  mediaTone = "balanced",
 }: HeroPhotoCardProps) {
   const shell = "rounded-[2rem]";
+  const mediaFilter =
+    mediaTone === "lowKey"
+      ? "grayscale brightness-[0.72] contrast-[1.12] saturate-0"
+      : "grayscale brightness-[0.9] contrast-[1.06] saturate-0";
   const videoSources: string[] =
     videoSourcesProp != null && videoSourcesProp.length > 0
       ? videoSourcesProp
@@ -60,7 +67,7 @@ export function HeroPhotoCard({
               playsInline
               preload="metadata"
               aria-label={alt}
-              className="absolute inset-0 z-0 h-full w-full scale-105 object-cover grayscale brightness-[0.9] contrast-[1.06] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]"
+              className={`absolute inset-0 z-0 h-full w-full scale-105 object-cover ${mediaFilter} transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]`}
             >
               {videoSources.map((url) => (
                 <source key={url} src={url} type="video/mp4" />
@@ -72,13 +79,17 @@ export function HeroPhotoCard({
               alt={alt}
               fill
               sizes="(max-width: 1024px) 100vw, 34vw"
-              className="object-cover grayscale brightness-[0.9] contrast-[1.06] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-[4] motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]"
+              className={`object-cover ${mediaFilter} transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-[4] motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]`}
               priority
             />
           ) : null}
         </div>
         <div
-          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/72 via-black/25 to-transparent"
+          className={`pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t to-transparent ${
+            mediaTone === "lowKey"
+              ? "from-black/82 via-black/42"
+              : "from-black/72 via-black/25"
+          }`}
           aria-hidden
         />
         <span className="absolute left-5 top-5 z-[2] rounded-full bg-black/60 px-3 py-1.5 backdrop-blur-md ring-1 ring-white/15">

@@ -26,10 +26,11 @@ const heroTiles: HeroPhotoCardProps[] = [
   },
   {
     title: "House music",
-    caption: "Coastal grooves & skyline water",
-    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.1.0&auto=format&fit=crop&w=1400&q=82",
-    alt: "Greyscale aerial view of turquoise water and shoreline",
+    caption: "Dim rooms, soft smoke & rolling low-end",
+    src: "https://images.unsplash.com/photo-1514525593451-8431f16da00d?auto=format&fit=crop&w=1400&q=82",
+    alt: "Greyscale nightclub scene with DJ booth, lights and crowd silhouettes",
     minHeightClass: "min-h-[208px]",
+    mediaTone: "lowKey",
   },
   {
     title: "Dance music",
