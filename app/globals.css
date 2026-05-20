@@ -18,6 +18,31 @@ body {
   @apply border border-white/10 bg-black/50 backdrop-blur-md;
 }
 
+/* Header lockup: sound bars = 48px; wordmark taller, shared bottom edge */
+.ludzy-header-logo {
+  display: block !important;
+  width: auto !important;
+  height: 3.5rem !important; /* 56px — mobile */
+  max-width: min(18rem, 58vw) !important;
+  object-fit: contain !important;
+  object-position: left bottom !important;
+  mix-blend-mode: screen;
+}
+
+@media (min-width: 640px) {
+  .ludzy-header-logo {
+    height: 3.85rem !important; /* ~62px */
+    max-width: min(20rem, 52vw) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .ludzy-header-logo {
+    height: 4.5rem !important; /* 72px — desktop */
+    max-width: min(22.5rem, 44vw) !important;
+  }
+}
+
 /* Moving purple ↔ coral gradient for section / card eyebrow titles */
 @keyframes title-gradient-flow {
   0%,
