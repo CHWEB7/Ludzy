@@ -1,32 +1,20 @@
-"use client";
-
-import Image from "next/image";
-import { useState } from "react";
-
-/** Your exported PNG (preferred). Falls back to bundled SVG if PNG is missing. */
+/** Official wordmark — must exist at `public/images/ludzy-logo.png` (your PNG export). */
 const LOGO_PNG = "/images/ludzy-logo.png";
-const LOGO_SVG = "/images/ludzy-logo.svg";
 
 /**
- * Wide wordmark — bottom-aligned with sound bars (both sit in `h-12` / `items-end`).
+ * Wide PNG wordmark — bottom-aligned with the sound bars (`h-12`).
  */
 export function LudzyLogoImage({ className = "" }: { className?: string }) {
-  const [src, setSrc] = useState(LOGO_PNG);
-
   return (
-    <div
-      className={`relative h-12 w-[200px] shrink-0 sm:w-[228px] md:w-[256px] ${className}`}
-    >
-      <Image
-        src={src}
+    <div className={`flex h-12 items-end ${className}`}>
+      <img
+        src={LOGO_PNG}
         alt="LUDZY"
-        fill
-        priority
-        sizes="(max-width: 768px) 200px, 256px"
-        className="object-contain object-left-bottom"
-        onError={() => {
-          if (src !== LOGO_SVG) setSrc(LOGO_SVG);
-        }}
+        width={280}
+        height={48}
+        className="h-12 w-auto max-w-[min(280px,52vw)] object-contain object-left-bottom"
+        decoding="async"
+        fetchPriority="high"
       />
     </div>
   );
