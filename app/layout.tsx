@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Dancing_Script, Outfit } from "next/font/google";
 import "./globals.css";
 import { FloatingHeader } from "@/components/FloatingHeader";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -46,6 +47,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-ink antialiased">
         <FloatingHeader />
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
