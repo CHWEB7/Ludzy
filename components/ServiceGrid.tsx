@@ -62,7 +62,7 @@ export function ServiceGrid() {
                 <span aria-hidden>{s.icon}</span>
               </span>
             </div>
-            <h3 className="font-display text-sm font-semibold uppercase tracking-[0.25em] text-white">
+            <h3 className="title-impact !text-sm !tracking-[0.25em]">
               {s.title}
             </h3>
             <p className="mt-4 text-sm leading-relaxed text-white/65">{s.body}</p>
@@ -95,7 +95,7 @@ export function ServiceGrid() {
             </div>
             <h2
               id="service-modal-title"
-              className="font-display text-center text-lg font-semibold uppercase tracking-[0.28em] text-white"
+              className="title-impact !text-lg !tracking-[0.28em] text-center"
             >
               {active.title}
             </h2>
