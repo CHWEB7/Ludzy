@@ -5,10 +5,12 @@ export type HeroPhotoCardProps = {
   caption?: string;
   /** Portrait-ish thumbnails stack tighter vertically — taller hero stacks welcome */
   minHeightClass?: string;
-  /** Still image — omit when `videoSrc` is set */
+  /** Still image — omit when video sources are set */
   src?: string;
-  /** Background video (e.g. `/videos/evening-social.mp4`) — takes precedence over `src` */
+  /** Single MP4 URL (backward compatible); ignored if `videoSources` is set */
   videoSrc?: string;
+  /** Multiple MP4 sources (order = browser fallback). Use Pexels `videos.pexels.com` URLs + optional local file. */
+  videoSources?: string[];
   alt: string;
 };
 
@@ -22,9 +24,16 @@ export function HeroPhotoCard({
   minHeightClass = "min-h-[180px]",
   src,
   videoSrc,
+  videoSources: videoSourcesProp,
   alt,
 }: HeroPhotoCardProps) {
   const shell = "rounded-[2rem]";
+  const videoSources =
+    videoSourcesProp?.length ?? 0
+      ? videoSourcesProp
+      : videoSrc
+        ? [videoSrc]
+        : [];
 
   return (
     <div
@@ -43,7 +52,7 @@ export function HeroPhotoCard({
         className={`absolute inset-[2px] z-[1] overflow-hidden ${shell} border border-white/15 bg-neutral-950 shadow-[0_18px_48px_-24px_rgba(0,0,0,0.95)] ring-1 ring-white/10 transition-[box-shadow,border-color] duration-300 group-hover:border-white/40 group-hover:shadow-[0_22px_60px_-18px_rgba(255,255,255,0.14)]`}
       >
         <div className="absolute inset-0 overflow-hidden">
-          {videoSrc ? (
+          {videoSources.length > 0 ? (
             <video
               autoPlay
               muted
@@ -53,7 +62,9 @@ export function HeroPhotoCard({
               aria-label={alt}
               className="absolute inset-0 z-0 h-full w-full scale-105 object-cover grayscale brightness-[0.9] contrast-[1.06] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform motion-reduce:group-hover:scale-100 group-hover:scale-[1.06]"
             >
-              <source src={videoSrc} type="video/mp4" />
+              {videoSources.map((url) => (
+                <source key={url} src={url} type="video/mp4" />
+              ))}
             </video>
           ) : src ? (
             <Image

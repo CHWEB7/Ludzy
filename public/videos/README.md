@@ -1,15 +1,15 @@
 # Hero video (Evening social card)
 
-Place your MP4 here as:
+The site streams the **mixer close-up** clip from Pexels by default:
 
-**`evening-social.mp4`**
+- **Asset:** [`9003937` — Yan Krukau](https://www.pexels.com/video/close-up-footage-of-a-person-using-sound-mixer-9003937/)
 
-Copy from your machine, for example (PowerShell):
+The CDN filename includes resolution details and can change. Code uses **`9003937-uhd_2560_1440_25fps.mp4`** taken from that page (see browser devtools → Network when downloading).
+
+### Optional offline / self-hosted copy
 
 ```powershell
-copy "C:\Users\Charly Admin\Downloads\9003937-uhd_3840_2160_25fps.mp4" ".\public\videos\evening-social.mp4"
+copy "C:\path\to\your-download.mp4" ".\public\videos\evening-social.mp4"
 ```
 
-Large 4K files slow the site — consider compressing (e.g. HandBrake: 1080p, H.264, ~8–12 Mbps).
-
-Committing big binaries can bloat the repo; using a CDN or optimized encode is recommended.
+The `<video>` tries `/videos/evening-social.mp4` **after** the remote Pexels sources.

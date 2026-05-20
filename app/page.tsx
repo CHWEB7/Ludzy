@@ -6,19 +6,29 @@ import { ServiceGrid } from "@/components/ServiceGrid";
 const MIXCLOUD_CHILLED_IBIZA =
   "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/";
 
+/** Pexels: close-up footage of a person using sound mixer (Yan Krukau) — CDN file names differ from generic guesses */
+const PEXELS_MIXER_MP4_PRIMARY =
+  "https://videos.pexels.com/video-files/9003937/9003937-uhd_2560_1440_25fps.mp4";
+const PEXELS_MIXER_MP4_HD =
+  "https://videos.pexels.com/video-files/9003937/9003937-hd_1920_1080_25fps.mp4";
+
 const heroTiles: HeroPhotoCardProps[] = [
   {
     title: "Evening social",
     caption: "Motion & mood",
-    videoSrc: "/videos/evening-social.mp4",
-    alt: "Greyscale ambient video loop for evening social",
+    videoSources: [
+      PEXELS_MIXER_MP4_PRIMARY,
+      PEXELS_MIXER_MP4_HD,
+      "/videos/evening-social.mp4",
+    ],
+    alt: "Greyscale video: DJ mixer close-up (Pexels)",
     minHeightClass: "min-h-[200px]",
   },
   {
     title: "House music",
-    caption: "Sunset palms & warm grooves",
-    src: "https://images.unsplash.com/photo-1437719417032-8595f9cfcfee?auto=format&fit=crop&w=1400&q=82",
-    alt: "Greyscale palm trees and beach at sunset",
+    caption: "Coastal grooves & skyline water",
+    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.1.0&auto=format&fit=crop&w=1400&q=82",
+    alt: "Greyscale aerial view of turquoise water and shoreline",
     minHeightClass: "min-h-[208px]",
   },
   {
