@@ -1,12 +1,18 @@
 # Brand assets
 
-## Header logo (required)
+## Header logo (required) — **not** stored in Supabase
 
-Save **your** LUDZY wordmark PNG here as:
+The logo is a **normal website file**, like a photo on any site:
 
-**`ludzy-logo.png`**
+| Location on disk | URL in the browser |
+|------------------|-------------------|
+| `public/images/ludzy-logo.png` | `/images/ludzy-logo.png` |
 
-The header only uses this file — no SVG fallback.
+**Supabase** is only for **booking form** enquiries (`booking_inquiries` table). The logo does **not** go in Supabase.
+
+Save **your** LUDZY wordmark PNG here as **`ludzy-logo.png`**.
+
+**Tip:** Export with a **transparent** background if you can — looks cleaner on the glass header. A solid black PNG still works (we use blend mode on the header).
 
 Example (PowerShell), if your file is in Downloads:
 
