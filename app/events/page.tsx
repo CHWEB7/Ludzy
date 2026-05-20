@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function EventsPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden text-paper">
+    <main className="relative min-h-screen overflow-x-clip text-paper">
       <div
         className="pointer-events-none fixed inset-0 opacity-[0.06]"
         style={{
@@ -24,7 +24,7 @@ export default function EventsPage() {
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-10 md:px-10 md:pt-14">
+      <div className="relative mx-auto min-w-0 max-w-7xl px-5 pb-28 pt-10 md:px-10 md:pt-14">
         <header className="max-w-3xl">
           <p className="title-impact">Events</p>
           <h1 className="mt-4 font-display text-4xl font-semibold uppercase leading-[1.05] tracking-[0.08em] text-white md:text-5xl">

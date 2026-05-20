@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type SwipeCarouselProps = {
   label: string;
@@ -17,35 +17,83 @@ export function SwipeCarousel({
 }: SwipeCarouselProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
-  const updateScrollHints = () => {
+  const updateScrollHints = useCallback(() => {
     const el = trackRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    setCanScrollLeft(scrollLeft > 8);
-    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 8);
-  };
+    const overflow = scrollWidth - clientWidth > 4;
+    setCanScrollLeft(overflow && scrollLeft > 4);
+    setCanScrollRight(overflow && scrollLeft + clientWidth < scrollWidth - 4);
+  }, []);
 
   useEffect(() => {
-    updateScrollHints();
     const el = trackRef.current;
     if (!el) return;
+
+    updateScrollHints();
+
+    const ro = new ResizeObserver(() => updateScrollHints());
+    ro.observe(el);
+    Array.from(el.children).forEach((child) => ro.observe(child));
+
     const onResize = () => updateScrollHints();
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", onResize);
+    };
+  }, [updateScrollHints]);
 
   const scrollBy = (dir: -1 | 1) => {
     const el = trackRef.current;
     if (!el) return;
-    const amount = Math.min(el.clientWidth * 0.88, 400);
-    el.scrollBy({ left: dir * amount, behavior: "smooth" });
-    window.setTimeout(updateScrollHints, 400);
+
+    const cards = Array.from(
+      el.querySelectorAll<HTMLElement>(".events-carousel-card"),
+    );
+    if (cards.length === 0) {
+      const amount = Math.min(el.clientWidth * 0.85, 380);
+      el.scrollBy({ left: dir * amount, behavior: "smooth" });
+      window.setTimeout(updateScrollHints, 450);
+      return;
+    }
+
+    const scrollLeft = el.scrollLeft;
+    let target: number | null = null;
+
+    if (dir > 0) {
+      const next = cards.find((card) => card.offsetLeft + 4 > scrollLeft + 8);
+      if (next) target = next.offsetLeft;
+    } else {
+      const prev = [...cards]
+        .reverse()
+        .find((card) => card.offsetLeft + card.offsetWidth - 4 < scrollLeft - 8);
+      if (prev) target = prev.offsetLeft;
+    }
+
+    if (target == null) {
+      const amount = Math.min(el.clientWidth * 0.85, 380);
+      el.scrollBy({ left: dir * amount, behavior: "smooth" });
+    } else {
+      el.scrollTo({ left: target, behavior: "smooth" });
+    }
+    window.setTimeout(updateScrollHints, 450);
+  };
+
+  const onWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = trackRef.current;
+    if (!el || el.scrollWidth <= el.clientWidth + 4) return;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    if (e.deltaY === 0) return;
+    e.preventDefault();
+    el.scrollBy({ left: e.deltaY, behavior: "auto" });
+    updateScrollHints();
   };
 
   return (
-    <section className="relative">
+    <section className="relative min-w-0 w-full max-w-full">
       <div className="mb-8 max-w-2xl">
         <p className="title-impact">{label}</p>
         <h2 className="mt-4 font-display text-2xl font-semibold uppercase tracking-[0.16em] text-white md:text-3xl">
@@ -58,7 +106,7 @@ export function SwipeCarousel({
         ) : null}
       </div>
 
-      <div className="relative">
+      <div className="relative min-w-0 w-full max-w-full">
         <div
           className="pointer-events-none absolute inset-y-0 left-0 z-[2] w-8 bg-gradient-to-r from-ink to-transparent md:w-14"
           aria-hidden
@@ -71,7 +119,8 @@ export function SwipeCarousel({
         <div
           ref={trackRef}
           onScroll={updateScrollHints}
-          className="events-carousel-track flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain scroll-smooth pb-3 pt-1 md:gap-5"
+          onWheel={onWheel}
+          className="events-carousel-track flex w-full min-w-0 max-w-full snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain scroll-smooth pb-3 pt-1 touch-pan-x md:gap-5"
           role="region"
           aria-label={`${title} carousel`}
         >

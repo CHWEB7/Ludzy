@@ -22,6 +22,9 @@ body {
 .events-carousel-track {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .events-carousel-track::-webkit-scrollbar {
