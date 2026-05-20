@@ -1,7 +1,11 @@
 import Image from "next/image";
 import { BookingForm } from "@/components/BookingForm";
 import { HeroPhotoCard } from "@/components/HeroPhotoCard";
+import { MixcloudEmbed } from "@/components/MixcloudEmbed";
 import { ServiceGrid } from "@/components/ServiceGrid";
+
+const MIXCLOUD_CHILLED_IBIZA =
+  "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/";
 
 /** Swap to `/images/hero-light-trails.jpg` for your own long-exposure light-trails photo */
 const heroMainTextureSrc =
@@ -155,7 +159,7 @@ export default function Home() {
           <div className="grid gap-5 lg:grid-cols-3">
             <div className="glass-panel rounded-3xl p-8 lg:col-span-2">
               <div className="flex flex-wrap items-start gap-5">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-black/40">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-black/40">
                   <svg
                     width="32"
                     height="32"
@@ -173,12 +177,33 @@ export default function Home() {
                     />
                   </svg>
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="title-impact">On rotation</p>
                   <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/75 md:text-base">
                     Playing low slung bass lines, soulful edits, organic house and rare groove.
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-8 space-y-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+                  Now playing · Chilled Ibiza — DJ Ludzy
+                </p>
+                <MixcloudEmbed
+                  mixUrl={MIXCLOUD_CHILLED_IBIZA}
+                  title="DJ Ludzy — Chilled Ibiza mix on Mixcloud"
+                  height={120}
+                />
+                <p className="text-[11px] text-white/35">
+                  <a
+                    href={MIXCLOUD_CHILLED_IBIZA}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-white/20 underline-offset-2 transition hover:text-white/55"
+                  >
+                    Open on Mixcloud
+                  </a>
+                </p>
               </div>
             </div>
             <div className="glass-panel flex flex-col justify-between rounded-3xl p-8">
