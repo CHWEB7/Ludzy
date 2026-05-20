@@ -21,8 +21,10 @@ export function SectionLink({ sectionId, href, className, children }: SectionLin
       onClick={(e) => {
         if (pathname !== "/") return;
         e.preventDefault();
-        scrollToSection(sectionId);
-        window.history.replaceState(null, "", href);
+        window.setTimeout(() => {
+          scrollToSection(sectionId);
+          window.history.replaceState(null, "", href);
+        }, 50);
       }}
     >
       {children}

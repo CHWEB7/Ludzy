@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useMemo, useState } from "react";
-import { scrollToSection } from "@/lib/scroll-to-section";
+import { getHeaderScrollOffset, scrollToSection } from "@/lib/scroll-to-section";
 import { LudzyLogoImage } from "./LudzyLogoImage";
 import { SoundBars } from "./SoundBars";
 
@@ -51,15 +51,23 @@ export function FloatingHeader() {
     e: React.MouseEvent<HTMLAnchorElement>,
     sectionId: string | undefined,
   ) => {
-    setMenuOpen(false);
     if (!sectionId) return;
     e.preventDefault();
-    if (pathname === "/") {
-      scrollToSection(sectionId);
-      window.history.replaceState(null, "", `/#${sectionId}`);
-      return;
-    }
-    router.push(`/#${sectionId}`);
+    const wasMenuOpen = menuOpen;
+    setMenuOpen(false);
+
+    const runScroll = () => {
+      if (pathname === "/") {
+        scrollToSection(sectionId);
+        window.history.replaceState(null, "", `/#${sectionId}`);
+        return;
+      }
+      router.push(`/#${sectionId}`);
+    };
+
+    // Wait for drawer collapse — header height changes and skews scroll position
+    const delay = wasMenuOpen ? 520 : 50;
+    window.setTimeout(runScroll, delay);
   };
 
   useEffect(() => {
@@ -85,19 +93,31 @@ export function FloatingHeader() {
   }, [menuOpen]);
 
   useEffect(() => {
+    const syncScrollMargin = () => {
+      document.documentElement.style.setProperty(
+        "--header-scroll-offset",
+        `${getHeaderScrollOffset()}px`,
+      );
+    };
+    syncScrollMargin();
+    window.addEventListener("resize", syncScrollMargin);
+    return () => window.removeEventListener("resize", syncScrollMargin);
+  }, [menuOpen]);
+
+  useEffect(() => {
     if (pathname !== "/") return;
 
     const scrollFromHash = (behavior: ScrollBehavior = "auto") => {
       const hash = window.location.hash.replace("#", "");
       if (!hash) return;
-      window.setTimeout(() => scrollToSection(hash, behavior), 80);
+      window.setTimeout(() => scrollToSection(hash, behavior), menuOpen ? 520 : 100);
     };
 
     scrollFromHash();
     const onHashChange = () => scrollFromHash("smooth");
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
-  }, [pathname]);
+  }, [pathname, menuOpen]);
 
   const barOpacity = useMemo(() => 1 - fade, [fade]);
 

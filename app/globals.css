@@ -10,9 +10,9 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Hash targets sit below sticky header (backup for native scroll-margin) */
+/* Hash targets sit below sticky header (synced with --header-scroll-offset in JS) */
 .scroll-section {
-  scroll-margin-top: 8.25rem;
+  scroll-margin-top: var(--header-scroll-offset, 7rem);
 }
 
 body {

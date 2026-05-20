@@ -17,6 +17,11 @@ const mixcloudShows = [
     url: "https://www.mixcloud.com/DJ-Ludzy/uk-garage-thursday-night-live-with-ludzy-20260514-185716/",
     embedTitle: "DJ Ludzy — UK Garage Thursday Night Live on Mixcloud",
   },
+  {
+    label: "Nu Disco Sampler",
+    url: "https://www.mixcloud.com/DJ-Ludzy/nu-disco-sampler/",
+    embedTitle: "DJ Ludzy — Nu Disco Sampler on Mixcloud",
+  },
 ] as const;
 
 /** Pexels: close-up footage of a person using sound mixer (Yan Krukau) — CDN file names differ from generic guesses */
@@ -141,8 +146,8 @@ export default function Home() {
         </section>
 
         {/* Music */}
-        <section id="music" className="scroll-section mt-20 lg:mt-28">
-          <div className="mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <section className="mt-20 lg:mt-28">
+          <div id="music" className="scroll-section mb-12 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="title-impact">The sound</p>
               <h2 className="mt-4 font-display text-2xl font-semibold uppercase tracking-[0.2em] text-white md:text-3xl">
@@ -214,8 +219,8 @@ export default function Home() {
         </section>
 
         {/* Services */}
-        <section id="services" className="scroll-section mt-20 lg:mt-28">
-          <div className="mb-12 max-w-2xl">
+        <section className="mt-20 lg:mt-28">
+          <div id="services" className="scroll-section mb-12 max-w-2xl">
             <p className="title-impact">Services</p>
             <h2 className="mt-4 font-display text-2xl font-semibold uppercase tracking-[0.2em] text-white md:text-3xl">
               Four ways we set the room
@@ -230,8 +235,8 @@ export default function Home() {
 
         {/* Philosophy + enquire */}
         <section className="mt-20 grid gap-10 rounded-[2rem] border border-white/12 bg-black/65 p-10 backdrop-blur lg:mt-28 lg:grid-cols-2 lg:gap-14 lg:p-14">
-          <div id="philosophy" className="scroll-section">
-            <p className="title-impact">Philosophy</p>
+          <div>
+            <p id="philosophy" className="title-impact scroll-section">Philosophy</p>
             <h2 className="mt-5 font-display text-2xl font-semibold uppercase leading-snug tracking-[0.16em] text-white md:text-3xl">
               Timeless.
               <br />
@@ -256,8 +261,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div id="enquire" className="scroll-section">
-            <p className="title-impact mb-6">Enquire</p>
+          <div>
+            <p id="enquire" className="title-impact scroll-section mb-6">Enquire</p>
             <h3 className="font-display text-xl font-semibold uppercase tracking-[0.22em] text-white md:text-2xl">
               Let&apos;s create something memorable
             </h3>
