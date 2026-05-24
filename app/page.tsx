@@ -1,6 +1,6 @@
 import { BookingForm } from "@/components/BookingForm";
 import { HeroPhotoCard, type HeroPhotoCardProps } from "@/components/HeroPhotoCard";
-import { InstagramCard } from "@/components/InstagramCard";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { MixcloudEmbed } from "@/components/MixcloudEmbed";
 import { ServiceGrid } from "@/components/ServiceGrid";
 import { SectionLink } from "@/components/SectionLink";
@@ -214,7 +214,7 @@ export default function Home() {
                 ))}
               </div>
             </div>
-            <InstagramCard />
+            <InstagramFeed />
           </div>
         </section>
 

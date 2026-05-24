@@ -23,6 +23,32 @@ body {
   @apply border border-white/10 bg-black/50 backdrop-blur-md;
 }
 
+/* Behold Instagram widget in sound section */
+.behold-feed [data-behold-id] {
+  width: 100%;
+}
+
+/* LightWidget iframe in Instagram panel */
+.lightwidget-container .lightwidget-widget {
+  width: 100%;
+  border: 0;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Compact Instagram post embeds (fallback) */
+.instagram-mini-feed blockquote.instagram-media {
+  margin: 0 auto !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.instagram-mini-feed iframe {
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
 /* Events page — horizontal swipe carousels */
 .events-carousel-track {
   scrollbar-width: none;
