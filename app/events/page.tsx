@@ -14,16 +14,6 @@ export const metadata: Metadata = {
 export default function EventsPage() {
   return (
     <main className="relative min-h-screen overflow-x-clip text-paper">
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-        aria-hidden
-      />
-
       <div className="relative mx-auto min-w-0 max-w-7xl px-5 pb-28 pt-10 md:px-10 md:pt-14">
         <header className="max-w-3xl">
           <p className="title-impact">Events</p>

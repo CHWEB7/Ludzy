@@ -133,6 +133,56 @@ body {
   }
 }
 
+/* ─── Test page — Fabric-inspired styles ─── */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-33.333%);
+  }
+}
+
+.test-marquee {
+  display: inline-flex;
+  animation: marquee-scroll 24s linear infinite;
+}
+
+.test-hero-title {
+  -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9);
+  paint-order: stroke fill;
+}
+
+.test-btn-primary {
+  background: white;
+  color: black;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.test-btn-primary:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-1px);
+}
+
+.test-btn-ghost {
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  background: transparent;
+  transition: border-color 0.3s, background 0.3s, transform 0.3s;
+}
+
+.test-btn-ghost:hover {
+  border-color: white;
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-marquee {
+    animation: none;
+  }
+}
+
 @layer components {
   .title-impact {
     @apply inline-block font-display text-xs font-semibold uppercase tracking-[0.35em];

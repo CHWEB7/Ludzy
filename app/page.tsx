@@ -67,17 +67,6 @@ const heroTiles: HeroPhotoCardProps[] = [
 export default function Home() {
   return (
     <main id="top" className="relative overflow-hidden text-paper">
-      {/* Ambient grid */}
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-        aria-hidden
-      />
-
       <div className="relative mx-auto max-w-7xl px-5 pb-28 pt-8 md:px-10 md:pt-10">
         {/* Hero — bento */}
         <section className="grid gap-5 lg:grid-cols-12 lg:gap-6">

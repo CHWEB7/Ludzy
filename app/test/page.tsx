@@ -1,0 +1,295 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Design Test | LUDZY",
+  robots: { index: false, follow: false },
+};
+
+const PEXELS_CROWD =
+  "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80";
+const PEXELS_DJ_BOOTH =
+  "https://images.pexels.com/photos/2111015/pexels-photo-2111015.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80";
+const PEXELS_VENUE =
+  "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80";
+const PEXELS_GARDEN =
+  "https://images.pexels.com/photos/13902049/pexels-photo-13902049.jpeg?auto=compress&cs=tinysrgb&w=1400&q=80";
+
+const services = [
+  {
+    title: "Weddings",
+    copy: "Ceremony warmth through to dancefloor energy. Every set bespoke to the couple.",
+    img: PEXELS_GARDEN,
+  },
+  {
+    title: "Private parties",
+    copy: "Birthdays, milestones, garden parties — tailored to the crowd and the moment.",
+    img: PEXELS_CROWD,
+  },
+  {
+    title: "Residencies",
+    copy: "Pubs, bars, hotels — one-off performances or a consistent weekly identity.",
+    img: PEXELS_VENUE,
+  },
+  {
+    title: "Corporate",
+    copy: "Product launches, awards, team events — polished pacing, refined energy.",
+    img: PEXELS_DJ_BOOTH,
+  },
+];
+
+const genres = [
+  "House",
+  "Soulful edits",
+  "UK garage",
+  "Nu disco",
+  "Rare groove",
+  "Organic house",
+];
+
+export default function TestPage() {
+  return (
+    <main className="relative text-white">
+      {/* ─── HERO ─── full-bleed, Fabric-style stacked type over video */}
+      <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 h-full w-full object-cover brightness-[0.35] saturate-0"
+          aria-hidden
+        >
+          <source
+            src="https://videos.pexels.com/video-files/9003937/9003937-uhd_2560_1440_25fps.mp4"
+            type="video/mp4"
+          />
+          <source
+            src="https://videos.pexels.com/video-files/9003937/9003937-hd_1920_1080_25fps.mp4"
+            type="video/mp4"
+          />
+        </video>
+
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+        <div className="relative z-10 px-6 pb-12 md:px-12 md:pb-20 lg:px-20">
+          <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.4em] text-white/50">
+            House &amp; dance music
+          </p>
+          <h1 className="test-hero-title max-w-5xl font-display text-[clamp(3rem,10vw,9rem)] font-bold uppercase leading-[0.88] tracking-[-0.02em] text-white">
+            Ludzy
+          </h1>
+          <p className="mt-6 max-w-lg text-base leading-relaxed text-white/60 md:text-lg">
+            Curated music, considered grooves, effortless atmosphere — from laid-back daytime sessions to elegant late-night experiences.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/#enquire"
+              className="test-btn-primary inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
+            >
+              Get in touch
+            </Link>
+            <Link
+              href="/#music"
+              className="test-btn-ghost inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
+            >
+              Listen
+            </Link>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 animate-bounce">
+          <div className="h-10 w-px bg-gradient-to-b from-transparent to-white/40" />
+        </div>
+      </section>
+
+      {/* ─── MARQUEE ─── rolling genre strip */}
+      <section className="overflow-hidden border-y border-white/10 bg-black py-4">
+        <div className="test-marquee whitespace-nowrap">
+          {[...genres, ...genres, ...genres].map((g, i) => (
+            <span
+              key={i}
+              className="mx-6 inline-block text-[11px] font-semibold uppercase tracking-[0.35em] text-white/40 md:mx-10"
+            >
+              {g}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── ABOUT ─── editorial two-column */}
+      <section className="relative px-6 py-24 md:px-12 md:py-36 lg:px-20">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-[0.4em] text-white/40">
+              The sound
+            </p>
+            <h2 className="mt-4 font-display text-4xl font-bold uppercase leading-[0.95] tracking-[-0.01em] text-white md:text-5xl lg:text-6xl">
+              Low-slung,
+              <br />
+              soulful,
+              <br />
+              organic.
+            </h2>
+            <p className="mt-8 max-w-md text-base leading-relaxed text-white/55">
+              Playing low-slung bass lines, soulful edits, organic house and rare groove. Timeless palettes for rooms that breathe — restrained peaks, tactile bass, melodic detail.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-2">
+              {genres.map((g) => (
+                <span
+                  key={g}
+                  className="rounded-full border border-white/15 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50"
+                >
+                  {g}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm">
+            <Image
+              src={PEXELS_DJ_BOOTH}
+              alt="DJ booth with warm lighting"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover brightness-75 saturate-[0.3]"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+        </div>
+      </section>
+
+      {/* ─── SERVICES ─── stacked full-bleed image rows, Fabric editorial style */}
+      <section className="border-t border-white/10">
+        {services.map((s, i) => (
+          <div
+            key={s.title}
+            className={`group relative flex min-h-[50vh] items-end overflow-hidden border-b border-white/10 md:min-h-[60vh] ${
+              i % 2 === 1 ? "flex-row-reverse" : ""
+            }`}
+          >
+            <Image
+              src={s.img}
+              alt={s.title}
+              fill
+              sizes="100vw"
+              className="object-cover brightness-[0.3] saturate-[0.15] transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+
+            <div className="relative z-10 flex w-full items-end justify-between gap-8 px-6 pb-10 pt-40 md:px-12 md:pb-16 lg:px-20">
+              <div>
+                <h3 className="font-display text-3xl font-bold uppercase tracking-[-0.01em] text-white md:text-5xl lg:text-6xl">
+                  {s.title}
+                </h3>
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/50 md:text-base">
+                  {s.copy}
+                </p>
+              </div>
+              <span className="hidden shrink-0 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/30 md:block">
+                0{i + 1}
+              </span>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* ─── QUOTE ─── full-width statement */}
+      <section className="flex min-h-[60vh] items-center justify-center px-6 py-24 md:px-12">
+        <div className="max-w-4xl text-center">
+          <blockquote className="font-display text-3xl font-bold uppercase leading-[1.1] tracking-[-0.01em] text-white md:text-5xl lg:text-6xl">
+            &ldquo;Crafting the perfect atmosphere for moments that matter.&rdquo;
+          </blockquote>
+          <p className="mt-6 text-[11px] font-medium uppercase tracking-[0.4em] text-white/35">
+            Ludzy — House &amp; dance music DJ
+          </p>
+        </div>
+      </section>
+
+      {/* ─── CTA ─── Fabric-style full-bleed image with overlay */}
+      <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden">
+        <Image
+          src={PEXELS_CROWD}
+          alt="Crowd at a music event"
+          fill
+          sizes="100vw"
+          className="object-cover brightness-[0.25] saturate-0"
+          unoptimized
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80" />
+
+        <div className="relative z-10 text-center">
+          <p className="text-[11px] font-medium uppercase tracking-[0.4em] text-white/40">
+            Available for hire
+          </p>
+          <h2 className="mt-4 font-display text-4xl font-bold uppercase leading-[0.92] tracking-[-0.01em] text-white md:text-6xl lg:text-7xl">
+            Book Ludzy
+          </h2>
+          <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-white/50">
+            Venue, date, timings, vibe — send a brief and let&apos;s make it happen.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/#enquire"
+              className="test-btn-primary inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
+            >
+              Enquire now
+            </Link>
+            <a
+              href="tel:07592262525"
+              className="test-btn-ghost inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
+            >
+              07592 262525
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── FOOTER ─── minimal */}
+      <footer className="border-t border-white/10 bg-black px-6 py-10 md:px-12 lg:px-20">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 md:flex-row">
+          <p className="text-[11px] font-medium uppercase tracking-[0.3em] text-white/30">
+            Ludzy — Design test page
+          </p>
+          <div className="flex gap-6">
+            <a
+              href="https://www.instagram.com/dj_ludzy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://www.mixcloud.com/DJ-Ludzy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white"
+            >
+              Mixcloud
+            </a>
+            <a
+              href="https://www.facebook.com/share/1BWMcvt3xe/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white"
+            >
+              Facebook
+            </a>
+          </div>
+          <Link
+            href="/"
+            className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white"
+          >
+            View current site →
+          </Link>
+        </div>
+      </footer>
+    </main>
+  );
+}
