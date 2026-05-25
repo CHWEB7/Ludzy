@@ -177,6 +177,33 @@ body {
   transform: translateY(-1px);
 }
 
+/* Test header — smaller logo next to mini bars */
+.test-header-logo-override .ludzy-header-logo {
+  width: 6rem !important;
+  min-width: 6rem !important;
+  max-height: 1.75rem !important;
+}
+
+@media (min-width: 640px) {
+  .test-header-logo-override .ludzy-header-logo {
+    width: 7.5rem !important;
+    min-width: 7.5rem !important;
+    max-height: 2rem !important;
+  }
+}
+
+/* Test page — horizontal scroll cards */
+.test-scroll-track {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
+}
+
+.test-scroll-track::-webkit-scrollbar {
+  display: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .test-marquee {
     animation: none;

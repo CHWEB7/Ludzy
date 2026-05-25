@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { TestScrollCards } from "@/components/TestScrollCards";
 
 export const metadata: Metadata = {
   title: "Design Test | LUDZY",
@@ -15,27 +16,70 @@ const PEXELS_VENUE =
   "https://images.pexels.com/photos/1540406/pexels-photo-1540406.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80";
 const PEXELS_GARDEN =
   "https://images.pexels.com/photos/13902049/pexels-photo-13902049.jpeg?auto=compress&cs=tinysrgb&w=1400&q=80";
+const PEXELS_TERRACE =
+  "https://images.pexels.com/photos/1267697/pexels-photo-1267697.jpeg?auto=compress&cs=tinysrgb&w=1400&q=80";
+const PEXELS_FESTIVAL =
+  "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1400&q=82";
 
-const services = [
+const serviceCards = [
   {
     title: "Weddings",
-    copy: "Ceremony warmth through to dancefloor energy. Every set bespoke to the couple.",
+    copy: "Ceremony warmth through to dancefloor energy. Every set bespoke to the couple, shaped around your timeline, crowd, and must-play moments.",
     img: PEXELS_GARDEN,
   },
   {
     title: "Private parties",
-    copy: "Birthdays, milestones, garden parties — tailored to the crowd and the moment.",
+    copy: "Birthdays, milestones, garden parties — tailored to the crowd and the moment. From laid-back afternoons to late-night peaks.",
     img: PEXELS_CROWD,
   },
   {
     title: "Residencies",
-    copy: "Pubs, bars, hotels — one-off performances or a consistent weekly identity.",
+    copy: "Pubs, bars, restaurants, hotels — one-off performances or a consistent weekly sonic identity that fits your venue's brand.",
     img: PEXELS_VENUE,
   },
   {
     title: "Corporate",
-    copy: "Product launches, awards, team events — polished pacing, refined energy.",
+    copy: "Product launches, awards, team events — polished pacing for receptions, showcases, and after-parties. Discrete, dependable, bespoke.",
     img: PEXELS_DJ_BOOTH,
+  },
+  {
+    title: "Terrace sessions",
+    copy: "Garden parties, beer gardens, open-air bars — daytime soul, sunset grooves, and breezy rollers calibrated for alfresco acoustics.",
+    img: PEXELS_TERRACE,
+  },
+  {
+    title: "Festivals",
+    copy: "Warm-up stages, headline slots, multi-room events — high-energy sets built for festival crowds and big sound systems.",
+    img: PEXELS_FESTIVAL,
+  },
+];
+
+function mixcloudEmbed(slug: string) {
+  return `https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=0&feed=${encodeURIComponent(`/DJ-Ludzy/${slug}/`)}`;
+}
+
+const mixCards = [
+  {
+    title: "Chilled Ibiza",
+    copy: "Downtempo edits and soulful vocal cuts — sunset energy for the terrace.",
+    embedUrl: mixcloudEmbed("chilled-ibiza-20260507-183957"),
+    externalUrl:
+      "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/",
+  },
+  {
+    title: "UK Garage — Thursday Night Live",
+    copy: "Soulful garage rollers into classic house — residency energy.",
+    embedUrl: mixcloudEmbed(
+      "uk-garage-thursday-night-live-with-ludzy-20260514-185716",
+    ),
+    externalUrl:
+      "https://www.mixcloud.com/DJ-Ludzy/uk-garage-thursday-night-live-with-ludzy-20260514-185716/",
+  },
+  {
+    title: "Nu Disco Sampler",
+    copy: "Rare groove and nu-disco flavours — polished, bright, feel-good.",
+    embedUrl: mixcloudEmbed("nu-disco-sampler"),
+    externalUrl: "https://www.mixcloud.com/DJ-Ludzy/nu-disco-sampler/",
   },
 ];
 
@@ -51,7 +95,7 @@ const genres = [
 export default function TestPage() {
   return (
     <main className="relative text-white">
-      {/* ─── HERO ─── full-bleed, Fabric-style stacked type over video */}
+      {/* ─── HERO ─── full-bleed video, Fabric-style */}
       <section className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden">
         <video
           autoPlay
@@ -82,7 +126,8 @@ export default function TestPage() {
             Ludzy
           </h1>
           <p className="mt-6 max-w-lg text-base leading-relaxed text-white/60 md:text-lg">
-            Curated music, considered grooves, effortless atmosphere — from laid-back daytime sessions to elegant late-night experiences.
+            Curated music, considered grooves, effortless atmosphere — from
+            laid-back daytime sessions to elegant late-night experiences.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -100,7 +145,6 @@ export default function TestPage() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <div className="absolute bottom-5 left-1/2 z-10 -translate-x-1/2 animate-bounce">
           <div className="h-10 w-px bg-gradient-to-b from-transparent to-white/40" />
         </div>
@@ -135,7 +179,9 @@ export default function TestPage() {
               organic.
             </h2>
             <p className="mt-8 max-w-md text-base leading-relaxed text-white/55">
-              Playing low-slung bass lines, soulful edits, organic house and rare groove. Timeless palettes for rooms that breathe — restrained peaks, tactile bass, melodic detail.
+              Playing low-slung bass lines, soulful edits, organic house and
+              rare groove. Timeless palettes for rooms that breathe — restrained
+              peaks, tactile bass, melodic detail.
             </p>
             <div className="mt-8 flex flex-wrap gap-2">
               {genres.map((g) => (
@@ -163,44 +209,28 @@ export default function TestPage() {
         </div>
       </section>
 
-      {/* ─── SERVICES ─── stacked full-bleed image rows, Fabric editorial style */}
-      <section className="border-t border-white/10">
-        {services.map((s, i) => (
-          <div
-            key={s.title}
-            className={`group relative flex min-h-[50vh] items-end overflow-hidden border-b border-white/10 md:min-h-[60vh] ${
-              i % 2 === 1 ? "flex-row-reverse" : ""
-            }`}
-          >
-            <Image
-              src={s.img}
-              alt={s.title}
-              fill
-              sizes="100vw"
-              className="object-cover brightness-[0.3] saturate-[0.15] transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+      {/* ─── SERVICES ─── horizontal scroll cards */}
+      <div className="border-t border-white/10">
+        <TestScrollCards
+          label="Services"
+          heading="What we do"
+          items={serviceCards}
+          variant="image"
+        />
+      </div>
 
-            <div className="relative z-10 flex w-full items-end justify-between gap-8 px-6 pb-10 pt-40 md:px-12 md:pb-16 lg:px-20">
-              <div>
-                <h3 className="font-display text-3xl font-bold uppercase tracking-[-0.01em] text-white md:text-5xl lg:text-6xl">
-                  {s.title}
-                </h3>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-white/50 md:text-base">
-                  {s.copy}
-                </p>
-              </div>
-              <span className="hidden shrink-0 text-[11px] font-semibold uppercase tracking-[0.3em] text-white/30 md:block">
-                0{i + 1}
-              </span>
-            </div>
-          </div>
-        ))}
-      </section>
+      {/* ─── MIXES ─── horizontal scroll cards with embeds */}
+      <div className="border-t border-white/10">
+        <TestScrollCards
+          label="On rotation"
+          heading="Listen"
+          items={mixCards}
+          variant="embed"
+        />
+      </div>
 
-      {/* ─── QUOTE ─── full-width statement */}
-      <section className="flex min-h-[60vh] items-center justify-center px-6 py-24 md:px-12">
+      {/* ─── QUOTE ─── */}
+      <section className="flex min-h-[60vh] items-center justify-center border-t border-white/10 px-6 py-24 md:px-12">
         <div className="max-w-4xl text-center">
           <blockquote className="font-display text-3xl font-bold uppercase leading-[1.1] tracking-[-0.01em] text-white md:text-5xl lg:text-6xl">
             &ldquo;Crafting the perfect atmosphere for moments that matter.&rdquo;
@@ -211,7 +241,7 @@ export default function TestPage() {
         </div>
       </section>
 
-      {/* ─── CTA ─── Fabric-style full-bleed image with overlay */}
+      {/* ─── CTA ─── full-bleed image */}
       <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden">
         <Image
           src={PEXELS_CROWD}
@@ -231,7 +261,8 @@ export default function TestPage() {
             Book Ludzy
           </h2>
           <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-white/50">
-            Venue, date, timings, vibe — send a brief and let&apos;s make it happen.
+            Venue, date, timings, vibe — send a brief and let&apos;s make it
+            happen.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
