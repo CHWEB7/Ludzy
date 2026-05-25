@@ -133,7 +133,7 @@ export default function TestPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/#enquire"
+              href="/test/contact"
               className="test-btn-primary inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
             >
               Get in touch
@@ -268,7 +268,7 @@ export default function TestPage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/#enquire"
+              href="/test/contact"
               className="test-btn-primary inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
             >
               Enquire now
