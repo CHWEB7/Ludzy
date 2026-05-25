@@ -177,6 +177,43 @@ body {
   transform: translateY(-1px);
 }
 
+/* Test header — sound bars with taller pulse */
+@keyframes test-bar-pulse {
+  0%, 100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1.35);
+  }
+}
+
+.test-sound-bar {
+  @apply origin-bottom rounded-full;
+  background-image: linear-gradient(
+    105deg,
+    #a464e6 0%,
+    #f69845 28%,
+    #a464e6 52%,
+    #f69845 76%,
+    #a464e6 100%
+  );
+  background-size: 260% 100%;
+  background-position: 0% 50%;
+  animation: title-gradient-flow 5.5s ease-in-out infinite,
+    test-bar-pulse 1.1s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(164, 100, 230, 0.3),
+    0 0 6px rgba(246, 152, 69, 0.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .test-sound-bar {
+    animation: none;
+    background-size: 100% 100%;
+    background-image: linear-gradient(115deg, #a464e6 0%, #f69845 100%);
+    box-shadow: none;
+  }
+}
+
 /* Test header — smaller logo next to mini bars */
 .test-header-logo-override .ludzy-header-logo {
   width: 6rem !important;

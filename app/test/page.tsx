@@ -120,14 +120,16 @@ export default function TestPage() {
 
         <div className="relative z-10 px-6 pb-12 md:px-12 md:pb-20 lg:px-20">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-[0.4em] text-white/50">
-            House &amp; dance music
+            House &amp; dance music DJ — Suffolk &amp; East Anglia
           </p>
           <h1 className="test-hero-title max-w-5xl font-display text-[clamp(3rem,10vw,9rem)] font-bold uppercase leading-[0.88] tracking-[-0.02em] text-white">
-            Ludzy
+            DJ Ludzy
           </h1>
-          <p className="mt-6 max-w-lg text-base leading-relaxed text-white/60 md:text-lg">
-            Curated music, considered grooves, effortless atmosphere — from
-            laid-back daytime sessions to elegant late-night experiences.
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
+            Professional DJ available for hire across Suffolk — Ipswich,
+            Woodbridge, Framlingham, Southwold, and beyond. Curated house,
+            soulful edits, and organic grooves for weddings, private parties,
+            corporate events, and venue residencies.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
