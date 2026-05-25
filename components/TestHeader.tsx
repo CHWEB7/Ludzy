@@ -6,7 +6,7 @@ import { LudzyLogoImage } from "./LudzyLogoImage";
 
 const navLinks = [
   { href: "/test", label: "Home" },
-  { href: "/events", label: "Events" },
+  { href: "/test/events", label: "Events" },
   { href: "/test/faq", label: "FAQ" },
   { href: "/test/contact", label: "Contact" },
 ] as const;
