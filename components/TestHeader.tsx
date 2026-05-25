@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import { LudzyLogoImage } from "./LudzyLogoImage";
 
 const navLinks = [
-  { href: "/test", label: "Home" },
-  { href: "/test/events", label: "Events" },
-  { href: "/test/faq", label: "FAQ" },
-  { href: "/test/contact", label: "Contact" },
+  { href: "/", label: "Home" },
+  { href: "/events", label: "Events" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/contact", label: "Contact" },
 ] as const;
 
 function MiniSoundBars() {
@@ -78,7 +78,7 @@ export function TestHeader() {
           </nav>
           <span className="h-5 w-px bg-white/20" aria-hidden />
           <Link
-            href="/test/contact"
+            href="/contact"
             className="test-btn-primary inline-flex px-6 py-2.5 text-[10px] font-bold uppercase tracking-[0.25em]"
           >
             Get in touch
@@ -134,7 +134,7 @@ export function TestHeader() {
             </Link>
           ))}
           <Link
-            href="/test/contact"
+            href="/contact"
             onClick={() => setMenuOpen(false)}
             className="mt-2 block w-full text-center test-btn-primary px-6 py-3 text-[11px] font-bold uppercase tracking-[0.25em]"
           >
