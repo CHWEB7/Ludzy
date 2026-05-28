@@ -17,33 +17,28 @@ const PEXELS_FESTIVAL =
 
 const serviceCards = [
   {
-    title: "Weddings",
-    copy: "Ceremony warmth through to dancefloor energy. Every set bespoke to the couple, shaped around your timeline, crowd, and must-play moments.",
-    img: PEXELS_GARDEN,
-  },
-  {
-    title: "Private parties",
-    copy: "Birthdays, milestones, garden parties — tailored to the crowd and the moment. From laid-back afternoons to late-night peaks.",
-    img: PEXELS_CROWD,
-  },
-  {
-    title: "Residencies",
-    copy: "Pubs, bars, restaurants, hotels — one-off performances or a consistent weekly sonic identity that fits your venue's brand.",
-    img: PEXELS_VENUE,
-  },
-  {
-    title: "Corporate",
+    title: "THE CORPORATE",
     copy: "Product launches, awards, team events — polished pacing for receptions, showcases, and after-parties. Discrete, dependable, bespoke.",
     img: PEXELS_DJ_BOOTH,
   },
   {
-    title: "Terrace sessions",
+    title: "THE TERRACE SESSION",
     copy: "Garden parties, beer gardens, open-air bars — daytime soul, sunset grooves, and breezy rollers calibrated for alfresco acoustics.",
     img: PEXELS_TERRACE,
   },
   {
-    title: "Festivals",
-    copy: "Warm-up stages, headline slots, multi-room events — high-energy sets built for festival crowds and big sound systems.",
+    title: "THE RESIDENCY",
+    copy: "Clubs, pubs, bars, restaurants, hotels — one-off performances or a consistent weekly sonic identity that fits your venue's brand.",
+    img: PEXELS_VENUE,
+  },
+  {
+    title: "THE GATHERING",
+    copy: "Weddings, birthdays, christenings, themed parties — tailored to the crowd and the moment. From laid-back afternoons to late-night peaks",
+    img: PEXELS_GARDEN,
+  },
+  {
+    title: "THE PERFORMANCE",
+    copy: "Concerts, festivals, warm-up stages, headline slots, multi-room events — high-energy sets built for crowds and big sound systems.",
     img: PEXELS_FESTIVAL,
   },
 ];
@@ -112,10 +107,9 @@ export default function HomePage() {
             DJ Ludzy
           </h1>
           <p className="mt-6 max-w-xl text-base leading-relaxed text-white/60 md:text-lg">
-            Professional DJ available for hire across Suffolk — Ipswich,
-            Woodbridge, Framlingham, Southwold, and beyond. Curated house,
-            soulful edits, and organic grooves for weddings, private parties,
-            corporate events, and venue residencies.
+            Grounded in Suffolk, covering the globe, professional DJ for hire —
+            Curated music, considered grooves, effortless atmosphere — from
+            laid-back daytime sessions to elegant late-night experiences.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/contact" className="test-btn-primary inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]">
