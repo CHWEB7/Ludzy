@@ -77,7 +77,7 @@ export function AdminEventsPanel() {
       return false;
     }
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    if (aal.currentLevel !== "aal2") {
+    if (!aal || aal.currentLevel !== "aal2") {
       router.replace("/admin/mfa");
       return false;
     }

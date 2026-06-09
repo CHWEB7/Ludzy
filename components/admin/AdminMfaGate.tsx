@@ -41,7 +41,7 @@ export function AdminMfaGate() {
       }
 
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-      if (aal.currentLevel === "aal2") {
+      if (aal?.currentLevel === "aal2") {
         finishToEvents();
         return;
       }
