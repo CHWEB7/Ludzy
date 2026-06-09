@@ -19,9 +19,9 @@ export function createAdminBrowserClient() {
       storage:
         typeof window !== "undefined"
           ? {
-              getItem: (key) => sessionStorage.getItem(key),
-              setItem: (key, value) => sessionStorage.setItem(key, value),
-              removeItem: (key) => sessionStorage.removeItem(key),
+              getItem: (key: string) => sessionStorage.getItem(key),
+              setItem: (key: string, value: string) => sessionStorage.setItem(key, value),
+              removeItem: (key: string) => sessionStorage.removeItem(key),
             }
           : undefined,
     },

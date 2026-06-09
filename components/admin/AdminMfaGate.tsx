@@ -54,6 +54,12 @@ export function AdminMfaGate() {
         return;
       }
 
+      if (!factorsData) {
+        setError("Could not load MFA factors");
+        setStep("verify");
+        return;
+      }
+
       const verifiedTotp = factorsData.totp.filter((f) => f.status === "verified");
 
       if (verifiedTotp.length === 0) {
@@ -62,7 +68,7 @@ export function AdminMfaGate() {
             factorType: "totp",
             friendlyName: "Authenticator app",
           });
-        if (enrollError || !enrollData) {
+        if (enrollError || !enrollData?.totp) {
           setError(enrollError?.message ?? "Could not start MFA enrolment");
           return;
         }
