@@ -1,24 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getPreviousEvent, previousEvents } from "@/lib/events-data";
+import {
+  fetchPreviousEventBySlug,
+  getStaticPreviousEvent,
+  toPreviousEvent,
+} from "@/lib/events-db";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export async function generateStaticParams() {
-  return previousEvents.map((e) => ({ slug: e.slug }));
-}
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const event = getPreviousEvent(slug);
+  const dbEvent = await fetchPreviousEventBySlug(slug);
+  const event = dbEvent ? toPreviousEvent(dbEvent) : getStaticPreviousEvent(slug);
   if (!event) return { title: "Event | DJ Ludzy" };
   return { title: `${event.title} | DJ Ludzy Events`, description: event.excerpt };
 }
 
 export default async function PreviousEventPage({ params }: Props) {
   const { slug } = await params;
-  const event = getPreviousEvent(slug);
+  const dbEvent = await fetchPreviousEventBySlug(slug);
+  const event = dbEvent ? toPreviousEvent(dbEvent) : getStaticPreviousEvent(slug);
   if (!event) notFound();
 
   return (
@@ -34,6 +39,13 @@ export default async function PreviousEventPage({ params }: Props) {
               <li className="text-white/55">{event.title}</li>
             </ol>
           </nav>
+
+          {dbEvent?.image_url && (
+            <div className="relative mb-10 aspect-[16/9] w-full overflow-hidden">
+              <Image src={dbEvent.image_url} alt="" fill className="object-cover brightness-75" priority unoptimized />
+            </div>
+          )}
+
           <header className="mb-12 border-b border-white/10 pb-10 md:mb-16 md:pb-14">
             <p className="text-[11px] font-medium uppercase tracking-[0.4em] text-white/40">Event recap</p>
             <h1 className="mt-4 font-display text-3xl font-bold uppercase leading-[0.95] tracking-[-0.01em] text-white md:text-4xl lg:text-5xl">{event.title}</h1>

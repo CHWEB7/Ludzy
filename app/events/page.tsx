@@ -1,14 +1,32 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { previousEvents, upcomingEvents } from "@/lib/events-data";
+import Image from "next/image";
 import { TestUpcomingCard } from "@/components/TestUpcomingCard";
+import {
+  fetchPublishedEvents,
+  getStaticPreviousEvents,
+  getStaticUpcomingEvents,
+  toPreviousEvent,
+  toUpcomingEvent,
+} from "@/lib/events-db";
 
 export const metadata: Metadata = {
   title: "Events | DJ Ludzy",
-  description: "Previous event recaps and upcoming bookings — DJ Ludzy house & dance music across Suffolk and East Anglia.",
+  description:
+    "Previous event recaps and upcoming bookings — DJ Ludzy house & dance music across Suffolk and East Anglia.",
 };
 
-export default function EventsPage() {
+export const revalidate = 60;
+
+export default async function EventsPage() {
+  const fromDb = await fetchPublishedEvents();
+  const previous = fromDb?.previous.length
+    ? fromDb.previous.map(toPreviousEvent)
+    : getStaticPreviousEvents();
+  const upcoming = fromDb?.upcoming.length
+    ? fromDb.upcoming.map(toUpcomingEvent)
+    : getStaticUpcomingEvents();
+
   return (
     <main className="relative min-h-screen text-white">
       <section className="relative flex min-h-[50vh] items-end overflow-hidden px-6 pb-16 pt-32 md:px-12 md:pb-20 lg:px-20">
@@ -32,20 +50,28 @@ export default function EventsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">Archive</p>
           <h2 className="mt-3 font-display text-2xl font-bold uppercase tracking-[-0.01em] text-white md:text-3xl">Previous events</h2>
           <div className="mt-10 grid gap-px bg-white/10 md:grid-cols-2">
-            {previousEvents.map((event) => (
-              <Link key={event.slug} href={`/events/${event.slug}`} className="group relative flex flex-col justify-between bg-black p-8 transition hover:bg-white/[0.03] md:p-10">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">{event.date}</p>
-                  <h3 className="mt-3 font-display text-lg font-bold uppercase tracking-[0.04em] text-white/90 transition group-hover:text-white md:text-xl">{event.title}</h3>
-                  <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-white/35">{event.venue}</p>
-                  <p className="mt-4 text-sm leading-relaxed text-white/50 transition group-hover:text-white/65">{event.excerpt}</p>
-                </div>
-                <span className="mt-6 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 transition group-hover:text-white">
-                  Read recap
-                  <svg className="h-3 w-3 transition-transform group-hover:translate-x-1" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2.5 6h7M6.5 2.5 10 6l-3.5 3.5" /></svg>
-                </span>
-              </Link>
-            ))}
+            {previous.map((event) => {
+              const dbRow = fromDb?.previous.find((r) => (r.slug ?? r.id) === event.slug);
+              return (
+                <Link key={event.slug} href={`/events/${event.slug}`} className="group relative flex flex-col justify-between bg-black p-8 transition hover:bg-white/[0.03] md:p-10">
+                  {dbRow?.image_url && (
+                    <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden">
+                      <Image src={dbRow.image_url} alt="" fill className="object-cover brightness-75" unoptimized />
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">{event.date}</p>
+                    <h3 className="mt-3 font-display text-lg font-bold uppercase tracking-[0.04em] text-white/90 transition group-hover:text-white md:text-xl">{event.title}</h3>
+                    <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-white/35">{event.venue}</p>
+                    <p className="mt-4 text-sm leading-relaxed text-white/50 transition group-hover:text-white/65">{event.excerpt}</p>
+                  </div>
+                  <span className="mt-6 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 transition group-hover:text-white">
+                    Read recap
+                    <svg className="h-3 w-3 transition-transform group-hover:translate-x-1" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2.5 6h7M6.5 2.5 10 6l-3.5 3.5" /></svg>
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -55,7 +81,7 @@ export default function EventsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">Diary</p>
           <h2 className="mt-3 font-display text-2xl font-bold uppercase tracking-[-0.01em] text-white md:text-3xl">Upcoming events</h2>
           <div className="mt-10">
-            {upcomingEvents.map((event) => (<TestUpcomingCard key={event.id} event={event} />))}
+            {upcoming.map((event) => (<TestUpcomingCard key={event.id} event={event} />))}
           </div>
         </div>
       </section>

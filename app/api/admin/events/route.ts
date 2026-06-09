@@ -1,0 +1,87 @@
+import { NextResponse } from "next/server";
+import { requireAdminAuth } from "@/lib/auth/require-admin";
+import { createServerSupabase } from "@/lib/supabase/server";
+import { slugify } from "@/lib/events-db";
+
+export async function GET(req: Request) {
+  const auth = await requireAdminAuth(req.headers.get("authorization"));
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  const supabase = createServerSupabase();
+  if (!supabase) {
+    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
+  }
+
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .order("event_type")
+    .order("sort_order", { ascending: false })
+    .order("event_date", { ascending: false, nullsFirst: false });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ events: data ?? [] });
+}
+
+export async function POST(req: Request) {
+  const auth = await requireAdminAuth(req.headers.get("authorization"));
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
+  }
+
+  const supabase = createServerSupabase();
+  if (!supabase) {
+    return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
+  }
+
+  const body = (await req.json()) as Record<string, unknown>;
+  const eventType = body.event_type as string;
+  if (eventType !== "previous" && eventType !== "upcoming") {
+    return NextResponse.json({ error: "Invalid event_type" }, { status: 400 });
+  }
+
+  const title = String(body.title ?? "").trim();
+  if (!title) {
+    return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  }
+
+  const slug =
+    eventType === "previous"
+      ? String(body.slug ?? "").trim() || slugify(title)
+      : null;
+
+  const row = {
+    event_type: eventType,
+    slug,
+    title,
+    date_display: String(body.date_display ?? "").trim(),
+    event_date: body.event_date ? String(body.event_date) : null,
+    venue: body.venue ? String(body.venue) : null,
+    location: body.location ? String(body.location) : null,
+    time_display: body.time_display ? String(body.time_display) : null,
+    set_type: body.set_type ? String(body.set_type) : null,
+    excerpt: body.excerpt ? String(body.excerpt) : null,
+    summary: body.summary ? String(body.summary) : null,
+    details: body.details ? String(body.details) : null,
+    body: Array.isArray(body.body) ? body.body : [],
+    image_url: body.image_url ? String(body.image_url) : null,
+    published: Boolean(body.published),
+    sort_order: Number(body.sort_order ?? 0),
+  };
+
+  if (!row.date_display) {
+    return NextResponse.json({ error: "Date is required" }, { status: 400 });
+  }
+
+  const { data, error } = await supabase.from("events").insert(row).select().single();
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ event: data }, { status: 201 });
+}
