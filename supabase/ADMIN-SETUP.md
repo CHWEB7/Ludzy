@@ -25,6 +25,24 @@ Secure admin area at **`/admin/login`** for managing events (text + images). Pub
 
 ## 3. Create admin user
 
+**Option A — script (recommended for a test account)**
+
+1. Add Supabase keys to `.env.local` (see section 4).
+2. Run:
+
+```bash
+npm run create-admin
+```
+
+Default test account:
+
+- Email: `test-admin@ludzy.online`
+- Password: `LudzyAdmin-Test2026!`
+
+Add that email to `ADMIN_EMAILS` and `NEXT_PUBLIC_ADMIN_EMAILS` (locally and on Vercel).
+
+**Option B — Supabase Dashboard**
+
 1. **Authentication** → **Users** → **Add user**.
 2. Use a strong password (12+ chars, mixed case, number, symbol).
 3. Use an email listed in `ADMIN_EMAILS`.
