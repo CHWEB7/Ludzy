@@ -67,3 +67,6 @@ create policy "Public read event images"
 
 grant select on table public.events to anon, authenticated, service_role;
 grant all on table public.events to service_role;
+
+-- Refresh PostgREST schema cache (fixes "table not found in schema cache" right after create)
+notify pgrst, 'reload schema';

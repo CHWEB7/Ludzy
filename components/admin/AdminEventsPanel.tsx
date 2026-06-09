@@ -105,7 +105,12 @@ export function AdminEventsPanel() {
         code?: string;
       };
       if (!res.ok) {
-        if (json.code === "TABLE_MISSING") setSetupRequired(true);
+        if (json.code === "TABLE_MISSING") {
+          setSetupRequired(true);
+          setError(null);
+          setEvents([]);
+          return;
+        }
         throw new Error(json.error ?? "Failed to load events");
       }
       setSetupRequired(false);
@@ -257,15 +262,22 @@ export function AdminEventsPanel() {
       </div>
 
       {setupRequired && (
-        <div className="mb-6 rounded border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-sm text-amber-100/90">
-          {EVENTS_TABLE_SETUP_MESSAGE}
+        <div className="mb-6 space-y-4 rounded border border-amber-500/30 bg-amber-950/30 px-4 py-4 text-sm text-amber-100/90">
+          <p>{EVENTS_TABLE_SETUP_MESSAGE}</p>
+          <ol className="list-decimal space-y-2 pl-5 text-amber-100/75">
+            <li>Open your Supabase project → <strong className="text-amber-100">SQL Editor</strong></li>
+            <li>Paste and run the file <code className="text-amber-50">supabase/events-schema.sql</code> from this repo</li>
+            <li>In Supabase → <strong className="text-amber-100">Table Editor</strong>, confirm you see an <code className="text-amber-50">events</code> table</li>
+            <li>Refresh this page (wait ~30 seconds after running SQL if it still errors)</li>
+          </ol>
+          <p className="text-xs text-amber-200/60">
+            Use the same Supabase project as your Vercel env vars{" "}
+            <code className="text-amber-50">NEXT_PUBLIC_SUPABASE_URL</code>.
+          </p>
         </div>
       )}
 
-      {error && !setupRequired && <p className="mb-6 text-sm text-rose-400">{error}</p>}
-      {error && setupRequired && (
-        <p className="mb-6 text-sm text-rose-400/80">{error}</p>
-      )}
+      {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
 
       <div className="grid gap-10 lg:grid-cols-2">
         <form onSubmit={handleSave} className="space-y-4 border border-white/10 p-6">
