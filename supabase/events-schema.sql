@@ -13,6 +13,7 @@ create table if not exists public.events (
   event_date timestamptz,
   venue text,
   location text,
+  maps_url text,
   time_display text,
   set_type text,
   excerpt text,

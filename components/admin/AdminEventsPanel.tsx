@@ -2,7 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LocationPicker } from "@/components/admin/LocationPicker";
 import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
+import {
+  formatBritishLongDate,
+  toDateInputValue,
+  toTimeInputValue,
+} from "@/lib/event-date-format";
+import { EVENTS_TABLE_SETUP_MESSAGE } from "@/lib/supabase/table-errors";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 import type { EventRecord } from "@/lib/events-db";
 
@@ -10,10 +17,10 @@ type EventForm = {
   event_type: "previous" | "upcoming";
   title: string;
   slug: string;
-  date_display: string;
   event_date: string;
   venue: string;
   location: string;
+  maps_url: string;
   time_display: string;
   set_type: string;
   excerpt: string;
@@ -22,17 +29,16 @@ type EventForm = {
   body: string;
   image_url: string;
   published: boolean;
-  sort_order: number;
 };
 
 const emptyForm: EventForm = {
   event_type: "previous",
   title: "",
   slug: "",
-  date_display: "",
   event_date: "",
   venue: "",
   location: "",
+  maps_url: "",
   time_display: "",
   set_type: "",
   excerpt: "",
@@ -41,7 +47,6 @@ const emptyForm: EventForm = {
   body: "",
   image_url: "",
   published: false,
-  sort_order: 0,
 };
 
 async function getAccessToken(): Promise<string | null> {
@@ -59,6 +64,7 @@ export function AdminEventsPanel() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [setupRequired, setSetupRequired] = useState(false);
 
   const authHeaders = useCallback(async () => {
     const token = await getAccessToken();
@@ -91,8 +97,16 @@ export function AdminEventsPanel() {
       if (!(await ensureAuthed())) return;
       const headers = await authHeaders();
       const res = await fetch("/api/admin/events", { headers });
-      const json = (await res.json()) as { events?: EventRecord[]; error?: string };
-      if (!res.ok) throw new Error(json.error ?? "Failed to load events");
+      const json = (await res.json()) as {
+        events?: EventRecord[];
+        error?: string;
+        code?: string;
+      };
+      if (!res.ok) {
+        if (json.code === "TABLE_MISSING") setSetupRequired(true);
+        throw new Error(json.error ?? "Failed to load events");
+      }
+      setSetupRequired(false);
       setEvents(json.events ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
@@ -116,11 +130,11 @@ export function AdminEventsPanel() {
       event_type: event.event_type,
       title: event.title,
       slug: event.slug ?? "",
-      date_display: event.date_display,
-      event_date: event.event_date?.slice(0, 10) ?? "",
+      event_date: toDateInputValue(event.event_date),
       venue: event.venue ?? "",
       location: event.location ?? "",
-      time_display: event.time_display ?? "",
+      maps_url: event.maps_url ?? "",
+      time_display: toTimeInputValue(event.time_display),
       set_type: event.set_type ?? "",
       excerpt: event.excerpt ?? "",
       summary: event.summary ?? "",
@@ -128,7 +142,6 @@ export function AdminEventsPanel() {
       body: event.body.join("\n\n"),
       image_url: event.image_url ?? "",
       published: event.published,
-      sort_order: event.sort_order,
     });
   }
 
@@ -160,14 +173,22 @@ export function AdminEventsPanel() {
     setSaving(true);
     setError(null);
     try {
+      if (!form.event_date) {
+        setError("Please select a date.");
+        setSaving(false);
+        return;
+      }
       const headers = await authHeaders();
       const payload = {
         ...form,
+        date_display: formatBritishLongDate(form.event_date),
         body: form.body
           .split(/\n\s*\n/)
           .map((p) => p.trim())
           .filter(Boolean),
         event_date: form.event_date || null,
+        maps_url: form.maps_url || null,
+        time_display: form.time_display || null,
       };
 
       const url = editingId ? `/api/admin/events/${editingId}` : "/api/admin/events";
@@ -233,7 +254,16 @@ export function AdminEventsPanel() {
         </div>
       </div>
 
-      {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
+      {setupRequired && (
+        <div className="mb-6 rounded border border-amber-500/30 bg-amber-950/30 px-4 py-3 text-sm text-amber-100/90">
+          {EVENTS_TABLE_SETUP_MESSAGE}
+        </div>
+      )}
+
+      {error && !setupRequired && <p className="mb-6 text-sm text-rose-400">{error}</p>}
+      {error && setupRequired && (
+        <p className="mb-6 text-sm text-rose-400/80">{error}</p>
+      )}
 
       <div className="grid gap-10 lg:grid-cols-2">
         <form onSubmit={handleSave} className="space-y-4 border border-white/10 p-6">
@@ -262,21 +292,31 @@ export function AdminEventsPanel() {
           )}
 
           <label className="block text-xs text-white/50">
-            Date (display) *
-            <input required value={form.date_display} onChange={(e) => setForm({ ...form, date_display: e.target.value })} placeholder="Saturday 24 May 2026" className={inputClass} />
-          </label>
-
-          <label className="block text-xs text-white/50">
-            Sort date (optional)
-            <input type="date" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} className={inputClass} />
+            Date *
+            <input
+              type="date"
+              required
+              value={form.event_date}
+              onChange={(e) => setForm({ ...form, event_date: e.target.value })}
+              className={inputClass}
+            />
+            {form.event_date && (
+              <p className="mt-1 text-[10px] text-white/35">
+                Displays as: {formatBritishLongDate(form.event_date)}
+              </p>
+            )}
           </label>
 
           {form.event_type === "previous" ? (
             <>
-              <label className="block text-xs text-white/50">
-                Venue
-                <input value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className={inputClass} />
-              </label>
+              <LocationPicker
+                label="Venue"
+                value={form.venue}
+                mapsUrl={form.maps_url}
+                onChange={(venue, mapsUrl) => setForm({ ...form, venue, maps_url: mapsUrl })}
+                className={inputClass}
+                placeholder="Search venue or address…"
+              />
               <label className="block text-xs text-white/50">
                 Excerpt *
                 <textarea required rows={3} value={form.excerpt} onChange={(e) => setForm({ ...form, excerpt: e.target.value })} className={inputClass} />
@@ -289,13 +329,25 @@ export function AdminEventsPanel() {
           ) : (
             <>
               <label className="block text-xs text-white/50">
-                Time
-                <input value={form.time_display} onChange={(e) => setForm({ ...form, time_display: e.target.value })} className={inputClass} />
+                Time (24-hour)
+                <input
+                  type="time"
+                  step="60"
+                  value={form.time_display}
+                  onChange={(e) => setForm({ ...form, time_display: e.target.value })}
+                  className={inputClass}
+                />
               </label>
-              <label className="block text-xs text-white/50">
-                Location
-                <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className={inputClass} />
-              </label>
+              <LocationPicker
+                label="Location"
+                value={form.location}
+                mapsUrl={form.maps_url}
+                onChange={(location, mapsUrl) =>
+                  setForm({ ...form, location, maps_url: mapsUrl })
+                }
+                className={inputClass}
+                placeholder="Search venue or address…"
+              />
               <label className="block text-xs text-white/50">
                 Set type
                 <input value={form.set_type} onChange={(e) => setForm({ ...form, set_type: e.target.value })} className={inputClass} />

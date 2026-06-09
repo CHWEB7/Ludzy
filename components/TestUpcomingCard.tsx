@@ -27,7 +27,19 @@ export function TestUpcomingCard({ event }: { event: UpcomingEvent }) {
             </h3>
             <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[11px] uppercase tracking-[0.2em] text-white/35">
               <span>{event.time}</span>
-              <span>{event.location}</span>
+              {event.mapsUrl ? (
+                <a
+                  href={event.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition hover:text-white/60"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {event.location}
+                </a>
+              ) : (
+                <span>{event.location}</span>
+              )}
               <span>{event.setType}</span>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import { googleMapsSearchUrl } from "@/lib/event-date-format";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
   previousEvents,
@@ -15,6 +16,7 @@ export type EventRecord = {
   event_date: string | null;
   venue: string | null;
   location: string | null;
+  maps_url: string | null;
   time_display: string | null;
   set_type: string | null;
   excerpt: string | null;
@@ -37,6 +39,7 @@ function mapRow(row: Record<string, unknown>): EventRecord {
     event_date: row.event_date ? String(row.event_date) : null,
     venue: row.venue ? String(row.venue) : null,
     location: row.location ? String(row.location) : null,
+    maps_url: row.maps_url ? String(row.maps_url) : null,
     time_display: row.time_display ? String(row.time_display) : null,
     set_type: row.set_type ? String(row.set_type) : null,
     excerpt: row.excerpt ? String(row.excerpt) : null,
@@ -61,12 +64,14 @@ export function toPreviousEvent(e: EventRecord): PreviousEvent {
 }
 
 export function toUpcomingEvent(e: EventRecord): UpcomingEvent {
+  const location = e.location ?? e.venue ?? "";
   return {
     id: e.id,
     title: e.title,
     date: e.date_display,
     time: e.time_display ?? "",
-    location: e.location ?? e.venue ?? "",
+    location,
+    mapsUrl: e.maps_url ?? (location ? googleMapsSearchUrl(location) : undefined),
     setType: e.set_type ?? "",
     summary: e.summary ?? e.excerpt ?? "",
     details: e.details ?? "",

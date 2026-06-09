@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { slugify } from "@/lib/events-db";
+import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
+import { formatBritishLongDate } from "@/lib/event-date-format";
 
 export async function GET(req: Request) {
   const auth = await requireAdminAuth(req.headers.get("authorization"));
@@ -22,7 +24,11 @@ export async function GET(req: Request) {
     .order("event_date", { ascending: false, nullsFirst: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const formatted = formatSupabaseEventsError(error.message);
+    return NextResponse.json(
+      { error: formatted.message, code: formatted.code },
+      { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+    );
   }
 
   return NextResponse.json({ events: data ?? [] });
@@ -55,14 +61,20 @@ export async function POST(req: Request) {
       ? String(body.slug ?? "").trim() || slugify(title)
       : null;
 
+  const eventDate = body.event_date ? String(body.event_date) : null;
+  const dateDisplay =
+    String(body.date_display ?? "").trim() ||
+    (eventDate ? formatBritishLongDate(eventDate) : "");
+
   const row = {
     event_type: eventType,
     slug,
     title,
-    date_display: String(body.date_display ?? "").trim(),
-    event_date: body.event_date ? String(body.event_date) : null,
+    date_display: dateDisplay,
+    event_date: eventDate,
     venue: body.venue ? String(body.venue) : null,
     location: body.location ? String(body.location) : null,
+    maps_url: body.maps_url ? String(body.maps_url) : null,
     time_display: body.time_display ? String(body.time_display) : null,
     set_type: body.set_type ? String(body.set_type) : null,
     excerpt: body.excerpt ? String(body.excerpt) : null,
@@ -74,13 +86,17 @@ export async function POST(req: Request) {
     sort_order: Number(body.sort_order ?? 0),
   };
 
-  if (!row.date_display) {
+  if (!row.date_display || !row.event_date) {
     return NextResponse.json({ error: "Date is required" }, { status: 400 });
   }
 
   const { data, error } = await supabase.from("events").insert(row).select().single();
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const formatted = formatSupabaseEventsError(error.message);
+    return NextResponse.json(
+      { error: formatted.message, code: formatted.code },
+      { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+    );
   }
 
   return NextResponse.json({ event: data }, { status: 201 });

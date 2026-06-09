@@ -5,7 +5,7 @@ Secure admin area at **`/admin/login`** for managing events (text + images). Pub
 ## Security model
 
 - **No public sign-up** — create admin users manually in Supabase Dashboard only.
-- **Email allowlist** — only addresses in `ADMIN_EMAILS` / `NEXT_PUBLIC_ADMIN_EMAILS` may sign in.
+- **Email allowlist** — only addresses in `ADMIN_EMAILS` may sign in (checked server-side).
 - **Strong passwords** — set Supabase Auth minimum password length to **12** and require complexity (Dashboard → Authentication → Providers → Email).
 - **MFA (TOTP)** — required via authenticator app (Google Authenticator, Authy, etc.). Enrolment on first login; verification on every new browser session.
 - **No trusted device** — auth tokens stored in **sessionStorage** (cleared when the browser tab/window closes).
@@ -15,7 +15,7 @@ Secure admin area at **`/admin/login`** for managing events (text + images). Pub
 ## 1. Supabase project
 
 1. Run `supabase/schema.sql` (booking table) if not already done.
-2. Run **`supabase/events-schema.sql`** (events table + image bucket).
+2. Run **`supabase/events-schema.sql`** in Supabase → **SQL Editor** (creates `public.events` + image bucket). **Required before `/admin/events` will work.**
 3. Optionally run **`supabase/events-seed.sql`** for sample rows.
 
 ## 2. Enable MFA
@@ -39,7 +39,7 @@ Default test account:
 - Email: `test-admin@ludzy.online`
 - Password: `LudzyAdmin-Test2026!`
 
-Add that email to `ADMIN_EMAILS` and `NEXT_PUBLIC_ADMIN_EMAILS` (locally and on Vercel).
+Add that email to `ADMIN_EMAILS` (locally and on Vercel). Redeploy after changing env vars.
 
 **Option B — Supabase Dashboard**
 
@@ -55,7 +55,6 @@ NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_ANON_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...
 ADMIN_EMAILS=info@ajeventspromotions.com
-NEXT_PUBLIC_ADMIN_EMAILS=info@ajeventspromotions.com
 ```
 
 ## 5. Install dependencies
@@ -80,6 +79,7 @@ npm install
 - **Upcoming events** — expandable cards on `/events`; no separate page.
 - **Images** — JPEG/PNG/WebP, max 5 MB; stored in Supabase Storage (`event-images` bucket).
 - **Published** — only checked events appear on the public site (updates within ~60 seconds due to cache revalidation).
+- **Google Maps (optional)** — set `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` for address autocomplete on location/venue fields. Manual entry works without it.
 
 ## Optional hardening (Supabase Dashboard)
 

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { slugify } from "@/lib/events-db";
+import { formatBritishLongDate } from "@/lib/event-date-format";
+import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -23,10 +25,18 @@ export async function PATCH(req: Request, { params }: Props) {
   const updates: Record<string, unknown> = {};
   if (eventType === "previous" || eventType === "upcoming") updates.event_type = eventType;
   if (body.title !== undefined) updates.title = String(body.title).trim();
-  if (body.date_display !== undefined) updates.date_display = String(body.date_display).trim();
-  if (body.event_date !== undefined) updates.event_date = body.event_date || null;
+  if (body.event_date !== undefined) {
+    updates.event_date = body.event_date || null;
+    if (body.event_date) {
+      updates.date_display = formatBritishLongDate(String(body.event_date));
+    }
+  }
+  if (body.date_display !== undefined && body.event_date === undefined) {
+    updates.date_display = String(body.date_display).trim();
+  }
   if (body.venue !== undefined) updates.venue = body.venue || null;
   if (body.location !== undefined) updates.location = body.location || null;
+  if (body.maps_url !== undefined) updates.maps_url = body.maps_url || null;
   if (body.time_display !== undefined) updates.time_display = body.time_display || null;
   if (body.set_type !== undefined) updates.set_type = body.set_type || null;
   if (body.excerpt !== undefined) updates.excerpt = body.excerpt || null;
@@ -53,7 +63,11 @@ export async function PATCH(req: Request, { params }: Props) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const formatted = formatSupabaseEventsError(error.message);
+    return NextResponse.json(
+      { error: formatted.message, code: formatted.code },
+      { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+    );
   }
 
   return NextResponse.json({ event: data });
@@ -73,7 +87,11 @@ export async function DELETE(req: Request, { params }: Props) {
 
   const { error } = await supabase.from("events").delete().eq("id", id);
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const formatted = formatSupabaseEventsError(error.message);
+    return NextResponse.json(
+      { error: formatted.message, code: formatted.code },
+      { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+    );
   }
 
   return NextResponse.json({ ok: true });

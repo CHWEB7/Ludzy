@@ -13,6 +13,7 @@ export type UpcomingEvent = {
   date: string;
   time: string;
   location: string;
+  mapsUrl?: string;
   setType: string;
   summary: string;
   details: string;
