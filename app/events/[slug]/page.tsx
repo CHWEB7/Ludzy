@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { AdminEditLink, EventsAdminBar } from "@/components/admin/EventsAdminBar";
 import {
   fetchPreviousEventBySlug,
   getStaticPreviousEvent,
@@ -28,8 +29,17 @@ export default async function PreviousEventPage({ params }: Props) {
 
   return (
     <main className="relative min-h-screen text-white">
+      <EventsAdminBar />
       <section className="px-6 pb-20 pt-28 md:px-12 md:pb-32 md:pt-36 lg:px-20">
         <div className="mx-auto max-w-3xl">
+          {dbEvent && (
+            <div className="mb-6 flex justify-end">
+              <AdminEditLink
+                eventId={dbEvent.id}
+                className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.15em]"
+              />
+            </div>
+          )}
           <nav aria-label="Breadcrumb" className="mb-12">
             <ol className="flex items-center gap-2 text-[11px] uppercase tracking-[0.3em] text-white/35">
               <li><Link href="/" className="transition hover:text-white/60">Home</Link></li>

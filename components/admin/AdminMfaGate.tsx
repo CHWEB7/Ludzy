@@ -17,8 +17,8 @@ export function AdminMfaGate() {
   const [factorId, setFactorId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const finishToEvents = useCallback(() => {
-    router.replace("/admin/events");
+  const finishToAdmin = useCallback(() => {
+    router.replace("/admin");
     router.refresh();
   }, [router]);
 
@@ -42,7 +42,7 @@ export function AdminMfaGate() {
 
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
       if (aal?.currentLevel === "aal2") {
-        finishToEvents();
+        finishToAdmin();
         return;
       }
 
@@ -84,7 +84,7 @@ export function AdminMfaGate() {
     }
 
     void init();
-  }, [router, finishToEvents]);
+  }, [router, finishToAdmin]);
 
   async function submitCode(mode: Step) {
     if (!factorId || code.length < 6) return;
@@ -117,7 +117,7 @@ export function AdminMfaGate() {
         setError(null);
       }
 
-      finishToEvents();
+      finishToAdmin();
     } catch {
       setError("Verification failed");
       setSubmitting(false);

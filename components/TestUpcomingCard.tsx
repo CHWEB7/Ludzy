@@ -1,13 +1,28 @@
 "use client";
 
 import { useState } from "react";
+import { AdminEditLink } from "@/components/admin/EventsAdminBar";
 import type { UpcomingEvent } from "@/lib/events-data";
 
-export function TestUpcomingCard({ event }: { event: UpcomingEvent }) {
+export function TestUpcomingCard({
+  event,
+  adminEditId,
+}: {
+  event: UpcomingEvent;
+  adminEditId?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
-    <article className="border-b border-white/10">
+    <article className="relative border-b border-white/10">
+      {adminEditId && (
+        <div className="absolute right-0 top-8 z-10">
+          <AdminEditLink
+            eventId={adminEditId}
+            className="rounded border border-emerald-500/30 bg-black/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.15em] text-emerald-300/90 backdrop-blur transition hover:border-emerald-400/50 hover:text-emerald-200"
+          />
+        </div>
+      )}
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}

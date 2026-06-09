@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { AdminNav } from "@/components/admin/AdminNav";
 import { LocationPicker } from "@/components/admin/LocationPicker";
 import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
 import {
@@ -57,6 +58,7 @@ async function getAccessToken(): Promise<string | null> {
 
 export function AdminEventsPanel() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -118,6 +120,18 @@ export function AdminEventsPanel() {
   useEffect(() => {
     void loadEvents();
   }, [loadEvents]);
+
+  useEffect(() => {
+    if (loading) return;
+    const editId = searchParams.get("edit");
+    const type = searchParams.get("type");
+    if (editId) {
+      const ev = events.find((e) => e.id === editId);
+      if (ev) startEdit(ev);
+    } else if (type === "previous" || type === "upcoming") {
+      startNew(type);
+    }
+  }, [searchParams, events, loading]);
 
   function startNew(type: "previous" | "upcoming") {
     setEditingId(null);
@@ -220,38 +234,26 @@ export function AdminEventsPanel() {
     }
   }
 
-  async function signOut() {
-    const supabase = createAdminBrowserClient();
-    await supabase.auth.signOut();
-    sessionStorage.clear();
-    router.replace("/admin/login");
-  }
+  const previousEvents = events.filter((e) => e.event_type === "previous");
+  const upcomingEvents = events.filter((e) => e.event_type === "upcoming");
 
   const inputClass =
     "mt-1 w-full border border-white/15 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-white";
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-12">
-      <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="font-display text-2xl font-bold uppercase tracking-[0.08em]">
-            Manage events
-          </h1>
-          <p className="mt-2 text-sm text-white/45">
-            Add past recaps and upcoming dates. Publish when ready to show on the public site.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => startNew("previous")} className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">
-            + Past event
-          </button>
-          <button type="button" onClick={() => startNew("upcoming")} className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">
-            + Upcoming
-          </button>
-          <button type="button" onClick={() => void signOut()} className="test-btn-primary px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">
-            Sign out
-          </button>
-        </div>
+      <AdminNav
+        title="Events"
+        description="Add, edit, and publish past recaps and upcoming diary dates."
+      />
+
+      <div className="mb-8 flex flex-wrap gap-2">
+        <button type="button" onClick={() => startNew("previous")} className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+          + Past event
+        </button>
+        <button type="button" onClick={() => startNew("upcoming")} className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]">
+          + Upcoming
+        </button>
       </div>
 
       {setupRequired && (
@@ -383,33 +385,88 @@ export function AdminEventsPanel() {
         </form>
 
         <div>
-          <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">All events</p>
+          <p className="mb-6 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">
+            All events
+          </p>
           {loading ? (
             <p className="text-sm text-white/40">Loading…</p>
           ) : events.length === 0 ? (
             <p className="text-sm text-white/40">No events yet. Create one or run the seed SQL.</p>
           ) : (
-            <ul className="space-y-3">
-              {events.map((ev) => (
-                <li key={ev.id} className="border border-white/10 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-white/35">
-                        {ev.event_type} · {ev.published ? "Published" : "Draft"}
-                      </p>
-                      <p className="font-semibold text-white/90">{ev.title}</p>
-                      <p className="text-xs text-white/45">{ev.date_display}</p>
-                    </div>
-                    <div className="flex shrink-0 gap-2">
-                      <button type="button" onClick={() => startEdit(ev)} className="text-[10px] uppercase tracking-[0.15em] text-white/50 hover:text-white">Edit</button>
-                      <button type="button" onClick={() => void handleDelete(ev.id)} className="text-[10px] uppercase tracking-[0.15em] text-rose-400/70 hover:text-rose-300">Delete</button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="space-y-8">
+              <div>
+                <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">
+                  Upcoming ({upcomingEvents.length})
+                </h3>
+                {upcomingEvents.length === 0 ? (
+                  <p className="text-sm text-white/35">No upcoming events yet.</p>
+                ) : (
+                  <ul className="space-y-3">
+                    {upcomingEvents.map((ev) => (
+                      <li key={ev.id} className="border border-white/10 p-4">
+                        <EventListItem ev={ev} onEdit={startEdit} onDelete={handleDelete} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <div>
+                <h3 className="mb-3 text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">
+                  Previous ({previousEvents.length})
+                </h3>
+                {previousEvents.length === 0 ? (
+                  <p className="text-sm text-white/35">No previous events yet.</p>
+                ) : (
+                  <ul className="space-y-3">
+                    {previousEvents.map((ev) => (
+                      <li key={ev.id} className="border border-white/10 p-4">
+                        <EventListItem ev={ev} onEdit={startEdit} onDelete={handleDelete} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function EventListItem({
+  ev,
+  onEdit,
+  onDelete,
+}: {
+  ev: EventRecord;
+  onEdit: (event: EventRecord) => void;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <div>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-white/35">
+          {ev.event_type} · {ev.published ? "Published" : "Draft"}
+        </p>
+        <p className="font-semibold text-white/90">{ev.title}</p>
+        <p className="text-xs text-white/45">{ev.date_display}</p>
+      </div>
+      <div className="flex shrink-0 gap-2">
+        <button
+          type="button"
+          onClick={() => onEdit(ev)}
+          className="text-[10px] uppercase tracking-[0.15em] text-white/50 hover:text-white"
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={() => void onDelete(ev.id)}
+          className="text-[10px] uppercase tracking-[0.15em] text-rose-400/70 hover:text-rose-300"
+        >
+          Delete
+        </button>
       </div>
     </div>
   );
