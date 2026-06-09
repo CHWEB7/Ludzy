@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { isAdminEmail } from "@/lib/auth/admin-access";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 
 export function AdminLoginForm() {
