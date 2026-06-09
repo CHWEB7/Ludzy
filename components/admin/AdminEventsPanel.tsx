@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
-import { isAdminEmail } from "@/lib/auth/admin-access";
 import type { EventRecord } from "@/lib/events-db";
 
 type EventForm = {
@@ -72,7 +72,7 @@ export function AdminEventsPanel() {
   const ensureAuthed = useCallback(async () => {
     const supabase = createAdminBrowserClient();
     const { data } = await supabase.auth.getSession();
-    if (!data.session?.user || !isAdminEmail(data.session.user.email)) {
+    if (!data.session?.user || !(await checkAdminEmailAllowed(data.session.user.email ?? "")).allowed) {
       router.replace("/admin/login");
       return false;
     }

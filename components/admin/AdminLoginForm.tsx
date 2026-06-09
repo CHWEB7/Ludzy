@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAdminEmail } from "@/lib/auth/admin-access";
+import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 
 export function AdminLoginForm() {
@@ -17,8 +17,15 @@ export function AdminLoginForm() {
     setError(null);
     setLoading(true);
 
-    if (!isAdminEmail(email)) {
-      setError("This email is not authorised for admin access.");
+    const { allowed, reason } = await checkAdminEmailAllowed(email);
+    if (!allowed) {
+      if (reason === "allowlist_not_configured") {
+        setError(
+          "Admin allowlist is not configured. Add ADMIN_EMAILS in Vercel (or .env.local) and redeploy.",
+        );
+      } else {
+        setError("This email is not authorised for admin access.");
+      }
       setLoading(false);
       return;
     }

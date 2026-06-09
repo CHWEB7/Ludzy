@@ -1,4 +1,4 @@
-/** Comma-separated admin emails in ADMIN_EMAILS env (server) or NEXT_PUBLIC_ADMIN_EMAILS (client check only). */
+/** Comma-separated admin emails in ADMIN_EMAILS (server). NEXT_PUBLIC_ADMIN_EMAILS is optional legacy fallback. */
 export function getAdminEmails(): string[] {
   const raw =
     process.env.ADMIN_EMAILS ??
@@ -15,6 +15,10 @@ export function isAdminEmail(email: string | undefined | null): boolean {
   const admins = getAdminEmails();
   if (admins.length === 0) return false;
   return admins.includes(email.trim().toLowerCase());
+}
+
+export function getAdminAllowlistStatus(): "ok" | "empty" {
+  return getAdminEmails().length === 0 ? "empty" : "ok";
 }
 
 /** Parse JWT payload without verification (token already validated by Supabase getUser). */
