@@ -67,6 +67,7 @@ export function AdminEventsPanel() {
   const searchParams = useSearchParams();
   const [events, setEvents] = useState<EventRecord[]>([]);
   const [deletedEvents, setDeletedEvents] = useState<EventRecord[]>([]);
+  const [softDeleteMigrationNeeded, setSoftDeleteMigrationNeeded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<EventForm>(emptyForm);
@@ -112,6 +113,7 @@ export function AdminEventsPanel() {
       const json = (await res.json()) as {
         events?: EventRecord[];
         deletedEvents?: EventRecord[];
+        softDeleteMigrationNeeded?: boolean;
         error?: string;
         code?: string;
       };
@@ -126,6 +128,7 @@ export function AdminEventsPanel() {
       }
       setEvents(json.events ?? []);
       setDeletedEvents(json.deletedEvents ?? []);
+      setSoftDeleteMigrationNeeded(Boolean(json.softDeleteMigrationNeeded));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
@@ -390,6 +393,17 @@ export function AdminEventsPanel() {
       </div>
 
       <AdminEventsSetup onReady={() => void loadEvents({ silent: true })} />
+
+      {softDeleteMigrationNeeded && (
+        <div className="mb-6 rounded border border-amber-500/30 bg-amber-950/30 px-4 py-4 text-sm text-amber-100/90">
+          <p className="font-medium text-amber-100">Soft delete migration required</p>
+          <p className="mt-2 text-amber-100/80">
+            Your events are still in the database. Run{" "}
+            <code className="rounded bg-black/30 px-1.5 py-0.5 text-amber-50">npm run migrate-soft-delete</code>{" "}
+            locally to enable 7-day deleted-event recovery.
+          </p>
+        </div>
+      )}
 
       {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
 

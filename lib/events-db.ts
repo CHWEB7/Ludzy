@@ -1,5 +1,6 @@
 import { googleMapsSearchUrl } from "@/lib/event-date-format";
 import { resolveEventImageUrl, resolveEventImageUrls } from "@/lib/event-image-url";
+import { supportsEventSoftDelete } from "@/lib/event-soft-delete";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
   previousEvents,
@@ -96,11 +97,11 @@ export async function fetchPublishedEvents(): Promise<{
   const supabase = createServerSupabase();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("published", true)
-    .is("deleted_at", null)
+  const softDelete = await supportsEventSoftDelete(supabase);
+  let query = supabase.from("events").select("*").eq("published", true);
+  if (softDelete) query = query.is("deleted_at", null);
+
+  const { data, error } = await query
     .order("sort_order", { ascending: false })
     .order("event_date", { ascending: false, nullsFirst: false });
 
@@ -134,26 +135,30 @@ export async function fetchPreviousEventBySlug(
   const supabase = createServerSupabase();
   if (!supabase) return null;
 
-  const { data: bySlug, error: slugError } = await supabase
+  const softDelete = await supportsEventSoftDelete(supabase);
+
+  let bySlugQuery = supabase
     .from("events")
     .select("*")
     .eq("published", true)
-    .is("deleted_at", null)
     .eq("event_type", "previous")
-    .eq("slug", slug)
-    .maybeSingle();
+    .eq("slug", slug);
+  if (softDelete) bySlugQuery = bySlugQuery.is("deleted_at", null);
+
+  const { data: bySlug, error: slugError } = await bySlugQuery.maybeSingle();
 
   if (slugError) return null;
   if (bySlug) return mapRow(bySlug as Record<string, unknown>);
 
-  const { data: byId, error: idError } = await supabase
+  let byIdQuery = supabase
     .from("events")
     .select("*")
     .eq("published", true)
-    .is("deleted_at", null)
     .eq("event_type", "previous")
-    .eq("id", slug)
-    .maybeSingle();
+    .eq("id", slug);
+  if (softDelete) byIdQuery = byIdQuery.is("deleted_at", null);
+
+  const { data: byId, error: idError } = await byIdQuery.maybeSingle();
 
   if (idError || !byId) return null;
   return mapRow(byId as Record<string, unknown>);

@@ -5,6 +5,7 @@ import { mapRow, slugify } from "@/lib/events-db";
 import { formatBritishLongDate } from "@/lib/event-date-format";
 import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
 import { revalidatePublicEventsPages } from "@/lib/revalidate-events";
+import { supportsEventSoftDelete } from "@/lib/event-soft-delete";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,8 +22,15 @@ export async function PATCH(req: Request, { params }: Props) {
   }
 
   const body = (await req.json()) as Record<string, unknown>;
+  const softDeleteEnabled = await supportsEventSoftDelete(supabase);
 
   if (body.restore === true) {
+    if (!softDeleteEnabled) {
+      return NextResponse.json(
+        { error: "Soft delete is not enabled. Run npm run migrate-soft-delete first." },
+        { status: 503 },
+      );
+    }
     const { data: existing, error: fetchError } = await supabase
       .from("events")
       .select("id, deleted_at, slug, event_type")
@@ -58,17 +66,19 @@ export async function PATCH(req: Request, { params }: Props) {
     return NextResponse.json({ event: mapRow(restored as Record<string, unknown>) });
   }
 
-  const { data: activeCheck } = await supabase
-    .from("events")
-    .select("deleted_at")
-    .eq("id", id)
-    .maybeSingle();
+  if (softDeleteEnabled) {
+    const { data: activeCheck } = await supabase
+      .from("events")
+      .select("deleted_at")
+      .eq("id", id)
+      .maybeSingle();
 
-  if (!activeCheck) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
-  }
-  if (activeCheck.deleted_at) {
-    return NextResponse.json({ error: "Restore this event before editing it" }, { status: 400 });
+    if (!activeCheck) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+    if (activeCheck.deleted_at) {
+      return NextResponse.json({ error: "Restore this event before editing it" }, { status: 400 });
+    }
   }
 
   const eventType = body.event_type as string | undefined;
@@ -203,25 +213,57 @@ export async function DELETE(req: Request, { params }: Props) {
 
   const { data: existing } = await supabase
     .from("events")
-    .select("slug, event_type, deleted_at")
+    .select(softDeleteEnabled ? "slug, event_type, deleted_at" : "slug, event_type")
     .eq("id", id)
     .maybeSingle();
 
   if (!existing) {
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
-  if (existing.deleted_at) {
-    return NextResponse.json({ error: "Event is already deleted" }, { status: 400 });
+
+  if (softDeleteEnabled) {
+    if ("deleted_at" in existing && existing.deleted_at) {
+      return NextResponse.json({ error: "Event is already deleted" }, { status: 400 });
+    }
+
+    const deletedAt = new Date().toISOString();
+    const { data: softDeleted, error } = await supabase
+      .from("events")
+      .update({ deleted_at: deletedAt, published: false })
+      .eq("id", id)
+      .is("deleted_at", null)
+      .select("id, slug, event_type, deleted_at")
+      .maybeSingle();
+
+    if (error) {
+      const formatted = formatSupabaseEventsError(error.message);
+      return NextResponse.json(
+        { error: formatted.message, code: formatted.code },
+        { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+      );
+    }
+
+    if (!softDeleted) {
+      return NextResponse.json({ error: "Event could not be deleted" }, { status: 404 });
+    }
+
+    revalidatePublicEventsPages(
+      existing.event_type === "previous" ? existing.slug : null,
+    );
+
+    return NextResponse.json({
+      ok: true,
+      id,
+      deleted_at: softDeleted.deleted_at,
+      softDeleteDays: 7,
+    });
   }
 
-  const deletedAt = new Date().toISOString();
-  const { data: softDeleted, error } = await supabase
+  const { data: hardDeleted, error } = await supabase
     .from("events")
-    .update({ deleted_at: deletedAt, published: false })
+    .delete()
     .eq("id", id)
-    .is("deleted_at", null)
-    .select("id, slug, event_type, deleted_at")
-    .maybeSingle();
+    .select("id");
 
   if (error) {
     const formatted = formatSupabaseEventsError(error.message);
@@ -231,7 +273,7 @@ export async function DELETE(req: Request, { params }: Props) {
     );
   }
 
-  if (!softDeleted) {
+  if (!hardDeleted || hardDeleted.length !== 1) {
     return NextResponse.json({ error: "Event could not be deleted" }, { status: 404 });
   }
 
@@ -239,10 +281,5 @@ export async function DELETE(req: Request, { params }: Props) {
     existing.event_type === "previous" ? existing.slug : null,
   );
 
-  return NextResponse.json({
-    ok: true,
-    id,
-    deleted_at: softDeleted.deleted_at,
-    softDeleteDays: 7,
-  });
+  return NextResponse.json({ ok: true, id });
 }
