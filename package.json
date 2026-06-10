@@ -19,6 +19,7 @@
     "diagnose-env": "node scripts/diagnose-env.mjs"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.5.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.49.1",
     "next": "^15.1.6",
