@@ -2,6 +2,8 @@ import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { fetchLatestMixcloudShows } from "@/lib/mixcloud";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const cronSecret = process.env.CRON_SECRET?.trim();
   const isVercelCron = req.headers.get("x-vercel-cron") === "1";
