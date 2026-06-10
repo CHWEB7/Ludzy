@@ -211,6 +211,8 @@ export async function DELETE(req: Request, { params }: Props) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
   }
 
+  const softDeleteEnabled = await supportsEventSoftDelete(supabase);
+
   const { data: existing } = await supabase
     .from("events")
     .select(softDeleteEnabled ? "slug, event_type, deleted_at" : "slug, event_type")
