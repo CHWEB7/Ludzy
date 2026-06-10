@@ -43,6 +43,13 @@ export function formatEventPurgeDate(deletedAt: string): string {
   });
 }
 
+/** Exclude soft-deleted rows when the deleted_at column exists. */
+export function applyActiveEventFilter<
+  Q extends { is: (column: string, value: null) => Q },
+>(query: Q, softDelete: boolean): Q {
+  return softDelete ? query.is("deleted_at", null) : query;
+}
+
 /** Permanently remove events that were soft-deleted more than 7 days ago. */
 export async function purgeExpiredDeletedEvents(supabase: SupabaseClient): Promise<void> {
   if (!(await supportsEventSoftDelete(supabase))) return;

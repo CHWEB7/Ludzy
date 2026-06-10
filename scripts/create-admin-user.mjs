@@ -10,10 +10,20 @@
  * Optional overrides:
  *   ADMIN_TEST_EMAIL=test-admin@ludzy.online
  *   ADMIN_TEST_PASSWORD=YourStrongPassword123!
+ *
+ * Presets:
+ *   node --env-file=.env.local scripts/create-admin-user.mjs events
  */
 
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "node:crypto";
+
+const PRESETS = {
+  events: {
+    email: "events-admin@ludzy.online",
+    password: "LudzyEvents-Admin2026!",
+  },
+};
 
 const DEFAULT_EMAIL = "test-admin@ludzy.online";
 const DEFAULT_PASSWORD = "LudzyAdmin-Test2026!";
@@ -33,10 +43,15 @@ function validatePassword(password) {
   return errors;
 }
 
+const preset = process.argv[2] ? PRESETS[process.argv[2]] : undefined;
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const email = (process.env.ADMIN_TEST_EMAIL ?? DEFAULT_EMAIL).trim().toLowerCase();
-const password = process.env.ADMIN_TEST_PASSWORD ?? DEFAULT_PASSWORD;
+const email = (
+  process.env.ADMIN_TEST_EMAIL ??
+  preset?.email ??
+  DEFAULT_EMAIL
+).trim().toLowerCase();
+const password = process.env.ADMIN_TEST_PASSWORD ?? preset?.password ?? DEFAULT_PASSWORD;
 
 if (!url || !serviceKey) {
   console.error(

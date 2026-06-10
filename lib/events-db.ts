@@ -1,6 +1,6 @@
 import { googleMapsSearchUrl } from "@/lib/event-date-format";
 import { resolveEventImageUrl, resolveEventImageUrls } from "@/lib/event-image-url";
-import { supportsEventSoftDelete } from "@/lib/event-soft-delete";
+import { applyActiveEventFilter, supportsEventSoftDelete } from "@/lib/event-soft-delete";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
   previousEvents,
@@ -98,10 +98,11 @@ export async function fetchPublishedEvents(): Promise<{
   if (!supabase) return null;
 
   const softDelete = await supportsEventSoftDelete(supabase);
-  let query = supabase.from("events").select("*").eq("published", true);
-  if (softDelete) query = query.is("deleted_at", null);
 
-  const { data, error } = await query
+  const { data, error } = await applyActiveEventFilter(
+    supabase.from("events").select("*").eq("published", true),
+    softDelete,
+  )
     .order("sort_order", { ascending: false })
     .order("event_date", { ascending: false, nullsFirst: false });
 
@@ -137,28 +138,28 @@ export async function fetchPreviousEventBySlug(
 
   const softDelete = await supportsEventSoftDelete(supabase);
 
-  let bySlugQuery = supabase
-    .from("events")
-    .select("*")
-    .eq("published", true)
-    .eq("event_type", "previous")
-    .eq("slug", slug);
-  if (softDelete) bySlugQuery = bySlugQuery.is("deleted_at", null);
-
-  const { data: bySlug, error: slugError } = await bySlugQuery.maybeSingle();
+  const { data: bySlug, error: slugError } = await applyActiveEventFilter(
+    supabase
+      .from("events")
+      .select("*")
+      .eq("published", true)
+      .eq("event_type", "previous")
+      .eq("slug", slug),
+    softDelete,
+  ).maybeSingle();
 
   if (slugError) return null;
   if (bySlug) return mapRow(bySlug as Record<string, unknown>);
 
-  let byIdQuery = supabase
-    .from("events")
-    .select("*")
-    .eq("published", true)
-    .eq("event_type", "previous")
-    .eq("id", slug);
-  if (softDelete) byIdQuery = byIdQuery.is("deleted_at", null);
-
-  const { data: byId, error: idError } = await byIdQuery.maybeSingle();
+  const { data: byId, error: idError } = await applyActiveEventFilter(
+    supabase
+      .from("events")
+      .select("*")
+      .eq("published", true)
+      .eq("event_type", "previous")
+      .eq("id", slug),
+    softDelete,
+  ).maybeSingle();
 
   if (idError || !byId) return null;
   return mapRow(byId as Record<string, unknown>);
