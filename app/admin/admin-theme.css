@@ -1,0 +1,166 @@
+/* Admin area light/dark theme — scoped to .admin-root only */
+
+.admin-root[data-admin-theme="dark"] {
+  color-scheme: dark;
+  background-color: #000;
+  color: #fff;
+}
+
+.admin-root[data-admin-theme="light"] {
+  color-scheme: light;
+  background-color: #f4f4f5;
+  color: #18181b;
+}
+
+.admin-root[data-admin-theme="light"] :where(.text-white) {
+  color: #18181b;
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/20"]) {
+  color: rgb(24 24 27 / 0.35);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/25"]) {
+  color: rgb(24 24 27 / 0.4);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/30"]) {
+  color: rgb(24 24 27 / 0.45);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/35"]) {
+  color: rgb(24 24 27 / 0.5);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/40"]) {
+  color: rgb(24 24 27 / 0.55);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/45"]) {
+  color: rgb(24 24 27 / 0.6);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/50"]) {
+  color: rgb(24 24 27 / 0.65);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/55"]) {
+  color: rgb(24 24 27 / 0.7);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/60"]) {
+  color: rgb(24 24 27 / 0.75);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/65"]) {
+  color: rgb(24 24 27 / 0.78);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-white/80"],
+  [class*="text-white/90"]) {
+  color: rgb(24 24 27 / 0.92);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="border-white/5"]) {
+  border-color: rgb(24 24 27 / 0.08);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="border-white/10"],
+  [class*="border-white/15"],
+  [class*="border-white/20"]) {
+  border-color: rgb(24 24 27 / 0.14);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="border-white/25"]) {
+  border-color: rgb(24 24 27 / 0.22);
+}
+
+.admin-root[data-admin-theme="light"] :where(.bg-black) {
+  background-color: #f4f4f5;
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="bg-black/25"],
+  [class*="bg-black/30"]) {
+  background-color: rgb(255 255 255 / 0.7);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="bg-black/50"],
+  [class*="bg-black/60"],
+  [class*="bg-black/80"]) {
+  background-color: #fff;
+}
+
+.admin-root[data-admin-theme="light"] :where(input:not([type="checkbox"]),
+  textarea,
+  select) {
+  background-color: #fff;
+  color: #18181b;
+  border-color: rgb(24 24 27 / 0.18);
+}
+
+.admin-root[data-admin-theme="light"] :where(input:not([type="checkbox"]):focus,
+  textarea:focus,
+  select:focus) {
+  border-color: #18181b;
+}
+
+.admin-root[data-admin-theme="light"] .test-btn-primary {
+  background: #18181b;
+  color: #fafafa;
+}
+
+.admin-root[data-admin-theme="light"] .test-btn-primary:hover {
+  background: #27272a;
+}
+
+.admin-root[data-admin-theme="light"] .test-btn-ghost {
+  border-color: rgb(24 24 27 / 0.22);
+  color: #18181b;
+  background: transparent;
+}
+
+.admin-root[data-admin-theme="light"] .test-btn-ghost:hover {
+  border-color: #18181b;
+  background: rgb(24 24 27 / 0.05);
+}
+
+.admin-root[data-admin-theme="dark"] .admin-theme-toggle {
+  border-color: rgb(255 255 255 / 0.2);
+  color: rgb(255 255 255 / 0.75);
+  background: rgb(0 0 0 / 0.4);
+}
+
+.admin-root[data-admin-theme="dark"] .admin-theme-toggle:hover {
+  border-color: rgb(255 255 255 / 0.45);
+  color: #fff;
+}
+
+.admin-root[data-admin-theme="light"] .admin-theme-toggle {
+  border-color: rgb(24 24 27 / 0.18);
+  color: rgb(24 24 27 / 0.75);
+  background: #fff;
+}
+
+.admin-root[data-admin-theme="light"] .admin-theme-toggle:hover {
+  border-color: #18181b;
+  color: #18181b;
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="border-amber-500"]) {
+  border-color: rgb(217 119 6 / 0.35);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="bg-amber-950"]) {
+  background-color: rgb(255 251 235);
+}
+
+.admin-root[data-admin-theme="light"] :where([class*="text-amber-100"],
+  [class*="text-amber-200"],
+  [class*="text-amber-50"]) {
+  color: rgb(120 53 15);
+}
+
+.admin-root[data-admin-theme="light"] :where(code[class*="bg-black"]) {
+  background-color: rgb(24 24 27 / 0.06);
+  color: #18181b;
+}

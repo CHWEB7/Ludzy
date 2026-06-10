@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { AdminThemeProvider } from "@/components/admin/AdminThemeProvider";
+import { AdminThemeToggle } from "@/components/admin/AdminThemeToggle";
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
@@ -16,8 +18,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <AdminThemeProvider>
+      <div className="fixed right-4 top-4 z-[100]">
+        <AdminThemeToggle />
+      </div>
       {children}
-    </div>
+    </AdminThemeProvider>
   );
 }
