@@ -4,6 +4,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { slugify } from "@/lib/events-db";
 import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
 import { formatBritishLongDate } from "@/lib/event-date-format";
+import { revalidatePublicEventsPages } from "@/lib/revalidate-events";
 
 export async function GET(req: Request) {
   const auth = await requireAdminAuth(req.headers.get("authorization"));
@@ -98,6 +99,10 @@ export async function POST(req: Request) {
       { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
     );
   }
+
+  revalidatePublicEventsPages(
+    data?.event_type === "previous" ? (data.slug as string | null) : null,
+  );
 
   return NextResponse.json({ event: data }, { status: 201 });
 }

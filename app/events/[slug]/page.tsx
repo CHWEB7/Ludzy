@@ -4,8 +4,7 @@ import { notFound } from "next/navigation";
 import { EventCoverImage } from "@/components/EventCoverImage";
 import {
   fetchPreviousEventBySlug,
-  getStaticPreviousEvent,
-  toPreviousEvent,
+  resolvePreviousEventForSlug,
 } from "@/lib/events-db";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -15,7 +14,7 @@ export const revalidate = 60;
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const dbEvent = await fetchPreviousEventBySlug(slug);
-  const event = dbEvent ? toPreviousEvent(dbEvent) : getStaticPreviousEvent(slug);
+  const event = resolvePreviousEventForSlug(slug, dbEvent);
   if (!event) return { title: "Event | DJ Ludzy" };
   return { title: `${event.title} | DJ Ludzy Events`, description: event.excerpt };
 }
@@ -23,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PreviousEventPage({ params }: Props) {
   const { slug } = await params;
   const dbEvent = await fetchPreviousEventBySlug(slug);
-  const event = dbEvent ? toPreviousEvent(dbEvent) : getStaticPreviousEvent(slug);
+  const event = resolvePreviousEventForSlug(slug, dbEvent);
   if (!event) notFound();
 
   return (

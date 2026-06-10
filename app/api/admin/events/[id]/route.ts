@@ -4,6 +4,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { slugify } from "@/lib/events-db";
 import { formatBritishLongDate } from "@/lib/event-date-format";
 import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
+import { revalidatePublicEventsPages } from "@/lib/revalidate-events";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -70,6 +71,10 @@ export async function PATCH(req: Request, { params }: Props) {
     );
   }
 
+  revalidatePublicEventsPages(
+    data?.event_type === "previous" ? (data.slug as string | null) : null,
+  );
+
   return NextResponse.json({ event: data });
 }
 
@@ -85,6 +90,12 @@ export async function DELETE(req: Request, { params }: Props) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
   }
 
+  const { data: existing } = await supabase
+    .from("events")
+    .select("slug, event_type")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase.from("events").delete().eq("id", id);
   if (error) {
     const formatted = formatSupabaseEventsError(error.message);
@@ -93,6 +104,10 @@ export async function DELETE(req: Request, { params }: Props) {
       { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
     );
   }
+
+  revalidatePublicEventsPages(
+    existing?.event_type === "previous" ? existing.slug : null,
+  );
 
   return NextResponse.json({ ok: true });
 }

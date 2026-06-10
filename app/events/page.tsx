@@ -4,10 +4,7 @@ import { EventCoverImage } from "@/components/EventCoverImage";
 import { TestUpcomingCard } from "@/components/TestUpcomingCard";
 import {
   fetchPublishedEvents,
-  getStaticPreviousEvents,
-  getStaticUpcomingEvents,
-  toPreviousEvent,
-  toUpcomingEvent,
+  resolvePublishedEventLists,
 } from "@/lib/events-db";
 
 export const metadata: Metadata = {
@@ -20,12 +17,7 @@ export const revalidate = 60;
 
 export default async function EventsPage() {
   const fromDb = await fetchPublishedEvents();
-  const previous = fromDb?.previous.length
-    ? fromDb.previous.map(toPreviousEvent)
-    : getStaticPreviousEvents();
-  const upcoming = fromDb?.upcoming.length
-    ? fromDb.upcoming.map(toUpcomingEvent)
-    : getStaticUpcomingEvents();
+  const { previous, upcoming } = resolvePublishedEventLists(fromDb);
 
   return (
     <main className="relative min-h-screen text-white">

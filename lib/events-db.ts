@@ -135,13 +135,38 @@ export async function fetchPreviousEventBySlug(
   return mapRow(data as Record<string, unknown>);
 }
 
-/** Fallback when Supabase has no rows yet. */
+/** Fallback when Supabase is not configured. */
 export function getStaticPreviousEvents(): PreviousEvent[] {
   return previousEvents;
 }
 
 export function getStaticUpcomingEvents(): UpcomingEvent[] {
   return upcomingEvents;
+}
+
+/** Use DB lists when Supabase is available; static templates only as offline fallback. */
+export function resolvePublishedEventLists(
+  fromDb: { previous: EventRecord[]; upcoming: EventRecord[] } | null,
+): { previous: PreviousEvent[]; upcoming: UpcomingEvent[] } {
+  if (!fromDb) {
+    return {
+      previous: getStaticPreviousEvents(),
+      upcoming: getStaticUpcomingEvents(),
+    };
+  }
+  return {
+    previous: fromDb.previous.map(toPreviousEvent),
+    upcoming: fromDb.upcoming.map(toUpcomingEvent),
+  };
+}
+
+export function resolvePreviousEventForSlug(
+  slug: string,
+  dbEvent: EventRecord | null,
+): PreviousEvent | null {
+  if (dbEvent) return toPreviousEvent(dbEvent);
+  if (createServerSupabase()) return null;
+  return getStaticPreviousEvent(slug) ?? null;
 }
 
 export function getStaticPreviousEvent(slug: string): PreviousEvent | undefined {
