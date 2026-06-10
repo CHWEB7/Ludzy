@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AdminEventsSetup } from "@/components/admin/AdminEventsSetup";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { LocationPicker } from "@/components/admin/LocationPicker";
+import { PreviousEventsReorderList } from "@/components/admin/PreviousEventsReorderList";
 import { verifyAdminAccessToken } from "@/lib/auth/check-admin-email-client";
 import {
   formatBritishLongDate,
@@ -93,6 +94,7 @@ export function AdminEventsPanel() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [reorderingPrevious, setReorderingPrevious] = useState(false);
 
   const authHeaders = useCallback(async () => {
     const token = await getAccessToken();
@@ -419,6 +421,42 @@ export function AdminEventsPanel() {
     }
   }
 
+  const handleReorderPrevious = useCallback(
+    async (orderedIds: string[]) => {
+      setReorderingPrevious(true);
+      setError(null);
+
+      setEvents((current) => {
+        const reordered = orderedIds
+          .map((id) => current.find((event) => event.id === id))
+          .filter((event): event is EventRecord => Boolean(event));
+        const upcoming = current.filter((event) => event.event_type === "upcoming");
+        return [...reordered, ...upcoming];
+      });
+
+      try {
+        const headers = await authHeaders();
+        const res = await fetch("/api/admin/events/reorder", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            event_type: "previous",
+            ordered_ids: orderedIds,
+          }),
+        });
+        const json = (await res.json()) as { error?: string };
+        if (!res.ok) throw new Error(json.error ?? "Reorder failed");
+        await loadEvents({ silent: true });
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Reorder failed");
+        await loadEvents({ silent: true });
+      } finally {
+        setReorderingPrevious(false);
+      }
+    },
+    [authHeaders, loadEvents],
+  );
+
   const previousEvents = events.filter((e) => e.event_type === "previous");
   const upcomingEvents = events.filter((e) => e.event_type === "upcoming");
 
@@ -698,18 +736,13 @@ export function AdminEventsPanel() {
                 {previousEvents.length === 0 ? (
                   <p className="text-sm text-white/35">No previous events yet.</p>
                 ) : (
-                  <ul className="space-y-3">
-                    {previousEvents.map((ev) => (
-                      <li key={ev.id} className="border border-white/10 p-4">
-                        <EventListItem
-                          ev={ev}
-                          onEdit={startEdit}
-                          onArchive={handleArchive}
-                          onDelete={requestDelete}
-                        />
-                      </li>
-                    ))}
-                  </ul>
+                  <PreviousEventsReorderList
+                    events={previousEvents}
+                    reordering={reorderingPrevious}
+                    onReorder={handleReorderPrevious}
+                    onEdit={startEdit}
+                    onDelete={requestDelete}
+                  />
                 )}
               </div>
             </div>
