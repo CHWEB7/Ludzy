@@ -87,11 +87,15 @@ if (error) {
     );
     if (existing) {
       await supabase.auth.admin.updateUserById(existing.id, {
+        password,
+        email_confirm: true,
         app_metadata: { ...existing.app_metadata, admin: true },
       });
     }
     console.log(`User already exists: ${email}`);
-    console.log("Granted app_metadata.admin = true in Supabase.");
+    console.log("Password reset to the value below and app_metadata.admin = true set.");
+    console.log("\n  Email:   ", email);
+    console.log("  Password:", password);
     console.log("\nThey can sign in at /admin/login (no Vercel ADMIN_EMAILS change needed).");
     console.log("\nOptional allowlist fallback:");
     console.log(`  ADDITIONAL_ADMIN_EMAILS=${email}`);

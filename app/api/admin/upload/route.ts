@@ -58,7 +58,7 @@ export async function POST(req: Request) {
   if (file.size > EVENT_IMAGE_MAX_UPLOAD_BYTES) {
     return NextResponse.json(
       {
-        error: `Optimised image must be under ${formatBytes(EVENT_IMAGE_MAX_UPLOAD_BYTES)}. Try a smaller photo.`,
+        error: `Optimised image is ${formatBytes(file.size)} (max ${formatBytes(EVENT_IMAGE_MAX_UPLOAD_BYTES)}). Try a smaller photo.`,
       },
       { status: 400 },
     );

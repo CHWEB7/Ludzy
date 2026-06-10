@@ -73,25 +73,43 @@ async function canvasToWebpBlob(canvas: HTMLCanvasElement, quality: number): Pro
   });
 }
 
+function resizeCanvas(source: HTMLCanvasElement, width: number, height: number): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Could not prepare image in this browser.");
+  ctx.drawImage(source, 0, 0, width, height);
+  return canvas;
+}
+
 async function encodeWithQuality(
   canvas: HTMLCanvasElement,
   startQuality: number,
-): Promise<{ blob: Blob; quality: number }> {
-  let quality = startQuality;
-  let blob = await canvasToWebpBlob(canvas, quality);
+): Promise<{ blob: Blob; quality: number; width: number; height: number }> {
+  let workCanvas = canvas;
 
-  while (blob.size > EVENT_IMAGE_MAX_UPLOAD_BYTES && quality > 0.5) {
-    quality -= 0.08;
-    blob = await canvasToWebpBlob(canvas, quality);
+  for (let scaleAttempt = 0; scaleAttempt < 8; scaleAttempt++) {
+    let quality = startQuality;
+    let blob = await canvasToWebpBlob(workCanvas, quality);
+
+    while (blob.size > EVENT_IMAGE_MAX_UPLOAD_BYTES && quality > 0.35) {
+      quality -= 0.08;
+      blob = await canvasToWebpBlob(workCanvas, quality);
+    }
+
+    if (blob.size <= EVENT_IMAGE_MAX_UPLOAD_BYTES) {
+      return { blob, quality, width: workCanvas.width, height: workCanvas.height };
+    }
+
+    const nextWidth = Math.max(480, Math.round(workCanvas.width * 0.85));
+    const nextHeight = Math.max(1, Math.round((workCanvas.height * nextWidth) / workCanvas.width));
+    workCanvas = resizeCanvas(workCanvas, nextWidth, nextHeight);
   }
 
-  if (blob.size > EVENT_IMAGE_MAX_UPLOAD_BYTES) {
-    throw new Error(
-      `Image is still too large after compression (${formatBytes(blob.size)}). Try a simpler photo or smaller original.`,
-    );
-  }
-
-  return { blob, quality };
+  throw new Error(
+    "Image is still too large after compression. Try a simpler photo or smaller original.",
+  );
 }
 
 /** Crop to site aspect ratio, resize, and compress to WebP before upload. */
@@ -125,14 +143,14 @@ export async function prepareEventImageFile(
 
   ctx.drawImage(img, crop.sx, crop.sy, crop.sw, crop.sh, 0, 0, scaled.width, scaled.height);
 
-  const { blob } = await encodeWithQuality(canvas, EVENT_IMAGE_WEBP_QUALITY);
+  const { blob, width, height } = await encodeWithQuality(canvas, EVENT_IMAGE_WEBP_QUALITY);
   const baseName = file.name.replace(/\.[^.]+$/, "") || "event-image";
   const outputFile = new File([blob], `${baseName}.webp`, { type: "image/webp" });
 
   return {
     file: outputFile,
-    width: scaled.width,
-    height: scaled.height,
+    width,
+    height,
     originalBytes: file.size,
     outputBytes: outputFile.size,
   };

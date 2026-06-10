@@ -1,3 +1,4 @@
+import { sendBookingNotificationEmail } from "@/lib/booking-email";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
@@ -70,5 +71,18 @@ export async function POST(req: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true });
+  const emailResult = await sendBookingNotificationEmail({
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    event_type: row.event_type,
+    event_date: row.event_date,
+    message: row.message,
+  });
+
+  if (!emailResult.ok) {
+    console.error("[booking] Email notification failed:", emailResult.error);
+  }
+
+  return NextResponse.json({ ok: true, emailSent: emailResult.ok });
 }

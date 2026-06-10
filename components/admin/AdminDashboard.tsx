@@ -50,13 +50,15 @@ export function AdminDashboard() {
             Choose an area to manage. More options will appear here as they are added.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={() => void signOut()}
-          className="test-btn-primary px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]"
-        >
-          Sign out
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void signOut()}
+            className="test-btn-primary px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]"
+          >
+            Sign out
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

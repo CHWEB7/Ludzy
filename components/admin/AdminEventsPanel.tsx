@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AdminEventsSetup } from "@/components/admin/AdminEventsSetup";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { LocationPicker } from "@/components/admin/LocationPicker";
-import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
+import { verifyAdminAccessToken } from "@/lib/auth/check-admin-email-client";
 import {
   formatBritishLongDate,
   toDateInputValue,
@@ -63,7 +63,16 @@ const emptyForm: EventForm = {
 async function getAccessToken(): Promise<string | null> {
   const supabase = createAdminBrowserClient();
   const { data } = await supabase.auth.getSession();
-  return data.session?.access_token ?? null;
+  const session = data.session;
+  if (!session?.access_token) return null;
+
+  const expiresAtMs = (session.expires_at ?? 0) * 1000;
+  if (expiresAtMs > 0 && expiresAtMs < Date.now() + 60_000) {
+    const { data: refreshed } = await supabase.auth.refreshSession();
+    return refreshed.session?.access_token ?? session.access_token;
+  }
+
+  return session.access_token;
 }
 
 export function AdminEventsPanel() {
@@ -79,6 +88,8 @@ export function AdminEventsPanel() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const uploadingRef = useRef(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -96,13 +107,23 @@ export function AdminEventsPanel() {
     const supabase = createAdminBrowserClient();
     const { data, error } = await supabase.auth.getUser();
     const user = data.user;
-    if (error || !user || !(await checkAdminEmailAllowed(user.email ?? "")).allowed) {
-      router.replace("/admin/login");
+    if (error || !user) {
+      if (!uploadingRef.current) router.replace("/admin/login");
       return false;
     }
+
+    const token = (await supabase.auth.getSession()).data.session?.access_token;
+    if (token) {
+      const { allowed, reason } = await verifyAdminAccessToken(token);
+      if (!allowed && reason !== "request_failed") {
+        if (!uploadingRef.current) router.replace("/admin/login");
+        return false;
+      }
+    }
+
     const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (!aal || aal.currentLevel !== "aal2") {
-      router.replace("/admin/mfa");
+      if (!uploadingRef.current) router.replace("/admin/mfa");
       return false;
     }
     return true;
@@ -197,15 +218,19 @@ export function AdminEventsPanel() {
   }
 
   async function handleUpload(file: File, target: "cover" | "gallery" = "cover") {
+    uploadingRef.current = true;
     setUploading(true);
     setUploadStatus("Optimising image…");
-    setError(null);
+    setUploadError(null);
     try {
       const prepared = await prepareEventImageFile(file, target);
       setUploadStatus("Uploading…");
 
       const token = await getAccessToken();
-      if (!token) throw new Error("Not signed in");
+      if (!token) {
+        setUploadError("Session expired. Save your work, then sign in again.");
+        return;
+      }
       const fd = new FormData();
       fd.append("file", prepared.file);
       const res = await fetch("/api/admin/upload", {
@@ -214,7 +239,10 @@ export function AdminEventsPanel() {
         body: fd,
       });
       const json = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok) throw new Error(json.error ?? "Upload failed");
+      if (!res.ok) {
+        setUploadError(json.error ?? "Upload failed");
+        return;
+      }
       if (target === "gallery") {
         setForm((f) => ({
           ...f,
@@ -227,9 +255,10 @@ export function AdminEventsPanel() {
         `Uploaded ${prepared.width}×${prepared.height}px (${Math.round(prepared.outputBytes / 1024)} KB)`,
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed");
+      setUploadError(e instanceof Error ? e.message : "Upload failed");
       setUploadStatus(null);
     } finally {
+      uploadingRef.current = false;
       setUploading(false);
     }
   }
@@ -556,6 +585,11 @@ export function AdminEventsPanel() {
               <span className="ml-2 text-xs text-white/40">
                 {uploading ? uploadStatus ?? "Working…" : uploadStatus}
               </span>
+            )}
+            {uploadError && (
+              <p className="mt-2 text-xs text-rose-400" role="alert">
+                {uploadError}
+              </p>
             )}
             {form.image_url && (
               <div className="mt-2 space-y-2">

@@ -24,9 +24,9 @@ export function useAdminSession(): AdminSessionState {
           return;
         }
 
-        const { allowed } = await verifyAdminAccessToken(accessToken);
+        const { allowed, reason } = await verifyAdminAccessToken(accessToken);
         const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-        if (!allowed || aal?.currentLevel !== "aal2") {
+        if ((!allowed && reason !== "request_failed") || aal?.currentLevel !== "aal2") {
           if (!cancelled) setState("guest");
           return;
         }

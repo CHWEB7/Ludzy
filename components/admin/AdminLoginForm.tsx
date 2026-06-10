@@ -25,7 +25,10 @@ export function AdminLoginForm() {
       });
 
       if (signInError) {
-        setError(signInError.message);
+        const message = signInError.message.toLowerCase().includes("invalid login credentials")
+          ? "Invalid email or password. The account may not exist yet — ask the site owner to run npm run reset-admin:events, then try again with the password they provide."
+          : signInError.message;
+        setError(message);
         setLoading(false);
         return;
       }
