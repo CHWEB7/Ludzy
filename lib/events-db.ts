@@ -59,6 +59,7 @@ export function mapRow(row: Record<string, unknown>): EventRecord {
 
 export function toPreviousEvent(e: EventRecord): PreviousEvent {
   return {
+    id: e.id,
     slug: e.slug ?? e.id,
     title: e.title,
     date: e.date_display,

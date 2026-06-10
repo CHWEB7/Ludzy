@@ -1,4 +1,5 @@
 export type PreviousEvent = {
+  id?: string;
   slug: string;
   title: string;
   date: string;

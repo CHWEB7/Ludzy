@@ -41,11 +41,15 @@ export default async function EventsPage() {
         <div className="mx-auto max-w-7xl">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">Archive</p>
           <h2 className="mt-3 font-display text-2xl font-bold uppercase tracking-[-0.01em] text-white md:text-3xl">Previous events</h2>
-          <div className="mt-10 grid gap-px bg-white/10 md:grid-cols-2">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {previous.map((event) => (
-                <Link key={event.slug} href={`/events/${event.slug}`} className="group relative flex flex-col justify-between bg-black p-8 transition hover:bg-white/[0.03] md:p-10">
+                <Link
+                  key={event.id ?? event.slug}
+                  href={`/events/${event.slug}`}
+                  className="group flex max-w-[420px] flex-col border border-white/10 bg-black p-5 transition hover:border-white/25 hover:bg-white/[0.03] md:p-6"
+                >
                   {event.imageUrl && (
-                    <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden">
+                    <div className="relative mb-4 aspect-[16/10] w-full overflow-hidden">
                       <EventCoverImage
                         src={event.imageUrl}
                         alt=""
@@ -53,13 +57,13 @@ export default async function EventsPage() {
                       />
                     </div>
                   )}
-                  <div>
+                  <div className="flex flex-1 flex-col">
                     <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">{event.date}</p>
-                    <h3 className="mt-3 font-display text-lg font-bold uppercase tracking-[0.04em] text-white/90 transition group-hover:text-white md:text-xl">{event.title}</h3>
+                    <h3 className="mt-2 font-display text-lg font-bold uppercase tracking-[0.06em] text-white/90 transition group-hover:text-white md:text-xl">{event.title}</h3>
                     <p className="mt-1 text-[11px] uppercase tracking-[0.2em] text-white/35">{event.venue}</p>
-                    <p className="mt-4 text-sm leading-relaxed text-white/50 transition group-hover:text-white/65">{event.excerpt}</p>
+                    <p className="mt-3 line-clamp-3 flex-1 text-sm leading-relaxed text-white/45 transition group-hover:text-white/60">{event.excerpt}</p>
                   </div>
-                  <span className="mt-6 inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40 transition group-hover:text-white">
+                  <span className="mt-4 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition group-hover:text-white">
                     Read recap
                     <svg className="h-3 w-3 transition-transform group-hover:translate-x-1" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2.5 6h7M6.5 2.5 10 6l-3.5 3.5" /></svg>
                   </span>

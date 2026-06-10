@@ -75,17 +75,46 @@ export async function PATCH(req: Request, { params }: Props) {
       return NextResponse.json({ error: "Only upcoming events can be archived" }, { status: 400 });
     }
 
-    updates.event_type = "previous";
-    updates.slug = existing.slug?.trim() || slugify(String(existing.title));
-    updates.venue = existing.venue || existing.location || null;
-    updates.excerpt =
-      existing.excerpt || existing.summary || String(existing.title);
-    if (!Array.isArray(updates.body)) {
-      updates.body = [];
+    let archiveSlug = existing.slug?.trim() || slugify(String(existing.title));
+    const { data: slugConflict } = await supabase
+      .from("events")
+      .select("id")
+      .eq("event_type", "previous")
+      .eq("slug", archiveSlug)
+      .neq("id", id)
+      .maybeSingle();
+
+    if (slugConflict) {
+      archiveSlug = `${archiveSlug}-${id.slice(0, 8)}`;
     }
-    updates.time_display = null;
-    updates.set_type = null;
-    updates.details = null;
+
+    const archiveUpdates = {
+      event_type: "previous",
+      slug: archiveSlug,
+      venue: existing.venue || existing.location || null,
+      excerpt: existing.excerpt || existing.summary || String(existing.title),
+      time_display: null,
+      set_type: null,
+      details: null,
+    };
+
+    const { data: archived, error: archiveError } = await supabase
+      .from("events")
+      .update(archiveUpdates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (archiveError) {
+      const formatted = formatSupabaseEventsError(archiveError.message);
+      return NextResponse.json(
+        { error: formatted.message, code: formatted.code },
+        { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+      );
+    }
+
+    revalidatePublicEventsPages(archived.slug as string | null);
+    return NextResponse.json({ event: archived });
   }
 
   const { data, error } = await supabase
@@ -128,7 +157,16 @@ export async function DELETE(req: Request, { params }: Props) {
     .eq("id", id)
     .maybeSingle();
 
-  const { error } = await supabase.from("events").delete().eq("id", id);
+  if (!existing) {
+    return NextResponse.json({ error: "Event not found" }, { status: 404 });
+  }
+
+  const { data: deleted, error } = await supabase
+    .from("events")
+    .delete()
+    .eq("id", id)
+    .select("id");
+
   if (error) {
     const formatted = formatSupabaseEventsError(error.message);
     return NextResponse.json(
@@ -137,9 +175,13 @@ export async function DELETE(req: Request, { params }: Props) {
     );
   }
 
+  if (!deleted || deleted.length !== 1) {
+    return NextResponse.json({ error: "Event could not be deleted" }, { status: 404 });
+  }
+
   revalidatePublicEventsPages(
-    existing?.event_type === "previous" ? existing.slug : null,
+    existing.event_type === "previous" ? existing.slug : null,
   );
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, id });
 }

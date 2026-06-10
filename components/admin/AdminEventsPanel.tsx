@@ -68,6 +68,9 @@ export function AdminEventsPanel() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   const authHeaders = useCallback(async () => {
     const token = await getAccessToken();
@@ -253,8 +256,23 @@ export function AdminEventsPanel() {
     }
   }
 
+  function clearEditorIfEditing(id: string) {
+    if (editingId !== id) return;
+    setEditingId(null);
+    setForm(emptyForm);
+  }
+
   async function handleArchive(id: string) {
-    if (!confirm("Move this upcoming event to previous events?")) return;
+    const target = events.find((event) => event.id === id);
+    if (!target) return;
+    if (
+      !confirm(
+        `Archive "${target.title}"?\n\nThis only moves this event to previous events. Other events are not changed.`,
+      )
+    ) {
+      return;
+    }
+
     try {
       const headers = await authHeaders();
       const res = await fetch(`/api/admin/events/${id}`, {
@@ -262,24 +280,55 @@ export function AdminEventsPanel() {
         headers,
         body: JSON.stringify({ archive: true }),
       });
-      const json = (await res.json()) as { error?: string };
+      const json = (await res.json()) as { event?: EventRecord; error?: string };
       if (!res.ok) throw new Error(json.error ?? "Archive failed");
+
+      if (json.event) {
+        setEvents((current) =>
+          current.map((event) => (event.id === id ? (json.event as EventRecord) : event)),
+        );
+      }
+      clearEditorIfEditing(id);
       await loadEvents({ silent: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Archive failed");
     }
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm("Delete this event permanently?")) return;
+  function requestDelete(id: string) {
+    const target = events.find((event) => event.id === id);
+    if (!target) return;
+    setDeleteConfirmText("");
+    setDeleteTarget({ id: target.id, title: target.title });
+  }
+
+  function cancelDelete() {
+    setDeleteTarget(null);
+    setDeleteConfirmText("");
+    setDeleting(false);
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget || deleteConfirmText.trim().toLowerCase() !== "delete") return;
+
+    setDeleting(true);
+    setError(null);
     try {
       const headers = await authHeaders();
-      const res = await fetch(`/api/admin/events/${id}`, { method: "DELETE", headers });
+      const res = await fetch(`/api/admin/events/${deleteTarget.id}`, {
+        method: "DELETE",
+        headers,
+      });
       const json = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(json.error ?? "Delete failed");
+
+      setEvents((current) => current.filter((event) => event.id !== deleteTarget.id));
+      clearEditorIfEditing(deleteTarget.id);
+      cancelDelete();
       await loadEvents({ silent: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
+      setDeleting(false);
     }
   }
 
@@ -308,6 +357,17 @@ export function AdminEventsPanel() {
       <AdminEventsSetup onReady={() => void loadEvents({ silent: true })} />
 
       {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
+
+      {deleteTarget && (
+        <DeleteEventDialog
+          title={deleteTarget.title}
+          confirmText={deleteConfirmText}
+          deleting={deleting}
+          onConfirmTextChange={setDeleteConfirmText}
+          onCancel={cancelDelete}
+          onConfirm={() => void confirmDelete()}
+        />
+      )}
 
       <div className="grid gap-10 lg:grid-cols-2">
         <form onSubmit={handleSave} className="space-y-4 border border-white/10 p-6">
@@ -501,7 +561,7 @@ export function AdminEventsPanel() {
                           ev={ev}
                           onEdit={startEdit}
                           onArchive={handleArchive}
-                          onDelete={handleDelete}
+                          onDelete={requestDelete}
                         />
                       </li>
                     ))}
@@ -522,7 +582,7 @@ export function AdminEventsPanel() {
                           ev={ev}
                           onEdit={startEdit}
                           onArchive={handleArchive}
-                          onDelete={handleDelete}
+                          onDelete={requestDelete}
                         />
                       </li>
                     ))}
@@ -531,6 +591,71 @@ export function AdminEventsPanel() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteEventDialog({
+  title,
+  confirmText,
+  deleting,
+  onConfirmTextChange,
+  onCancel,
+  onConfirm,
+}: {
+  title: string;
+  confirmText: string;
+  deleting: boolean;
+  onConfirmTextChange: (value: string) => void;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const canDelete = confirmText.trim().toLowerCase() === "delete";
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6">
+      <div
+        className="w-full max-w-md border border-white/15 bg-black p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-event-title"
+      >
+        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-rose-300/80">
+          Delete event
+        </p>
+        <h2 id="delete-event-title" className="mt-3 font-display text-xl font-bold uppercase text-white">
+          {title}
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-white/50">
+          This permanently removes only this event. Type <strong className="text-white/80">delete</strong> to confirm.
+        </p>
+        <input
+          type="text"
+          value={confirmText}
+          onChange={(e) => onConfirmTextChange(e.target.value)}
+          placeholder="Type delete"
+          autoFocus
+          className="mt-5 w-full border border-white/15 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-white"
+        />
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={deleting}
+            className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={!canDelete || deleting}
+            className="border border-rose-500/40 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-rose-300 transition hover:border-rose-400 hover:text-rose-200 disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            {deleting ? "Deleting…" : "Delete event"}
+          </button>
         </div>
       </div>
     </div>
@@ -549,7 +674,7 @@ function EventListItem({
   onDelete: (id: string) => void;
 }) {
   return (
-    <div className="flex items-start justify-between gap-3">
+    <div className="flex items-start justify-between gap-3" data-event-id={ev.id}>
       <div>
         <p className="text-[10px] uppercase tracking-[0.2em] text-white/35">
           {ev.event_type} · {ev.published ? "Published" : "Draft"}
@@ -576,7 +701,7 @@ function EventListItem({
         </button>
         <button
           type="button"
-          onClick={() => void onDelete(ev.id)}
+          onClick={() => onDelete(ev.id)}
           className="text-[10px] uppercase tracking-[0.15em] text-rose-400/70 hover:text-rose-300"
         >
           Delete
