@@ -11,12 +11,12 @@ export function useAdminSession(): AdminSessionState {
 
   useEffect(() => {
     let cancelled = false;
+    const supabase = createAdminBrowserClient();
 
     async function check() {
       try {
-        const supabase = createAdminBrowserClient();
-        const { data } = await supabase.auth.getSession();
-        const user = data.session?.user;
+        const { data, error } = await supabase.auth.getUser();
+        const user = error ? null : data.user;
         if (!user) {
           if (!cancelled) setState("guest");
           return;
@@ -36,8 +36,16 @@ export function useAdminSession(): AdminSessionState {
     }
 
     void check();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      void check();
+    });
+
     return () => {
       cancelled = true;
+      subscription.unsubscribe();
     };
   }, []);
 

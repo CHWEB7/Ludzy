@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AdminEventsSetup } from "@/components/admin/AdminEventsSetup";
 import { AdminNav } from "@/components/admin/AdminNav";
@@ -80,8 +80,9 @@ export function AdminEventsPanel() {
 
   const ensureAuthed = useCallback(async () => {
     const supabase = createAdminBrowserClient();
-    const { data } = await supabase.auth.getSession();
-    if (!data.session?.user || !(await checkAdminEmailAllowed(data.session.user.email ?? "")).allowed) {
+    const { data, error } = await supabase.auth.getUser();
+    const user = data.user;
+    if (error || !user || !(await checkAdminEmailAllowed(user.email ?? "")).allowed) {
       router.replace("/admin/login");
       return false;
     }
@@ -93,8 +94,8 @@ export function AdminEventsPanel() {
     return true;
   }, [router]);
 
-  const loadEvents = useCallback(async () => {
-    setLoading(true);
+  const loadEvents = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) setLoading(true);
     setError(null);
     try {
       if (!(await ensureAuthed())) return;
@@ -121,18 +122,30 @@ export function AdminEventsPanel() {
     }
   }, [authHeaders, ensureAuthed]);
 
+  const appliedSearchKey = useRef<string | null>(null);
+
   useEffect(() => {
     void loadEvents();
   }, [loadEvents]);
 
   useEffect(() => {
     if (loading) return;
+
     const editId = searchParams.get("edit");
     const type = searchParams.get("type");
+    const searchKey = editId ? `edit:${editId}` : type ? `type:${type}` : null;
+    if (!searchKey || appliedSearchKey.current === searchKey) return;
+
     if (editId) {
       const ev = events.find((e) => e.id === editId);
-      if (ev) startEdit(ev);
-    } else if (type === "previous" || type === "upcoming") {
+      if (!ev) return;
+      appliedSearchKey.current = searchKey;
+      startEdit(ev);
+      return;
+    }
+
+    if (type === "previous" || type === "upcoming") {
+      appliedSearchKey.current = searchKey;
       startNew(type);
     }
   }, [searchParams, events, loading]);
@@ -232,7 +245,7 @@ export function AdminEventsPanel() {
 
       setForm(emptyForm);
       setEditingId(null);
-      await loadEvents();
+      await loadEvents({ silent: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -251,7 +264,7 @@ export function AdminEventsPanel() {
       });
       const json = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(json.error ?? "Archive failed");
-      await loadEvents();
+      await loadEvents({ silent: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Archive failed");
     }
@@ -264,7 +277,7 @@ export function AdminEventsPanel() {
       const res = await fetch(`/api/admin/events/${id}`, { method: "DELETE", headers });
       const json = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(json.error ?? "Delete failed");
-      await loadEvents();
+      await loadEvents({ silent: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");
     }
@@ -292,7 +305,7 @@ export function AdminEventsPanel() {
         </button>
       </div>
 
-      <AdminEventsSetup onReady={() => void loadEvents()} />
+      <AdminEventsSetup onReady={() => void loadEvents({ silent: true })} />
 
       {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
 

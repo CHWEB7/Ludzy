@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { EVENTS_TABLE_SETUP_MESSAGE } from "@/lib/supabase/table-errors";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 
@@ -24,6 +24,12 @@ async function getAccessToken(): Promise<string | null> {
 export function AdminEventsSetup({ onReady }: { onReady?: () => void }) {
   const [status, setStatus] = useState<SetupStatus | null>(null);
   const [checking, setChecking] = useState(true);
+  const onReadyRef = useRef(onReady);
+  const didNotifyReady = useRef(false);
+
+  useEffect(() => {
+    onReadyRef.current = onReady;
+  }, [onReady]);
 
   const check = useCallback(async () => {
     setChecking(true);
@@ -35,11 +41,14 @@ export function AdminEventsSetup({ onReady }: { onReady?: () => void }) {
       });
       const json = (await res.json()) as SetupStatus;
       setStatus(json);
-      if (json.tableReady) onReady?.();
+      if (json.tableReady && !didNotifyReady.current) {
+        didNotifyReady.current = true;
+        onReadyRef.current?.();
+      }
     } finally {
       setChecking(false);
     }
-  }, [onReady]);
+  }, []);
 
   useEffect(() => {
     void check();

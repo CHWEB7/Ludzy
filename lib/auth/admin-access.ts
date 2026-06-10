@@ -38,7 +38,3 @@ export function hasMfaSession(token: string): boolean {
   return getJwtClaim(token, "aal") === "aal2";
 }
 
-/** Idle timeout for admin sessions (30 minutes). */
-export const ADMIN_IDLE_MS = 30 * 60 * 1000;
-
-export const ADMIN_SESSION_KEY = "ludzy_admin_last_activity";
