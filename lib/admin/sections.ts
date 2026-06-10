@@ -15,6 +15,13 @@ export const adminSections: AdminSection[] = [
     available: true,
   },
   {
+    id: "blog",
+    title: "Blog",
+    description: "Write and publish blog posts with genre tags.",
+    href: "/admin/blog",
+    available: true,
+  },
+  {
     id: "site-content",
     title: "Site content",
     description: "Homepage copy, services, and other page content.",
