@@ -22,7 +22,8 @@ create table if not exists public.events (
   image_url text,
   gallery_images jsonb not null default '[]'::jsonb,
   published boolean not null default false,
-  sort_order int not null default 0
+  sort_order int not null default 0,
+  deleted_at timestamptz
 );
 
 alter table public.events enable row level security;
@@ -31,7 +32,7 @@ drop policy if exists "Public read published events" on public.events;
 create policy "Public read published events"
   on public.events for select
   to anon, authenticated
-  using (published = true);
+  using (published = true and deleted_at is null);
 
 grant usage on schema public to anon, authenticated, service_role;
 grant select on table public.events to anon, authenticated, service_role;

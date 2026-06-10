@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { slugify, mapRow } from "@/lib/events-db";
+import {
+  getEventSoftDeleteCutoffIso,
+  purgeExpiredDeletedEvents,
+} from "@/lib/event-soft-delete";
 import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
 import { formatBritishLongDate } from "@/lib/event-date-format";
 import { revalidatePublicEventsPages } from "@/lib/revalidate-events";
@@ -17,9 +21,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
   }
 
+  await purgeExpiredDeletedEvents(supabase);
+
+  const deletedCutoff = getEventSoftDeleteCutoffIso();
+
   const { data, error } = await supabase
     .from("events")
     .select("*")
+    .is("deleted_at", null)
     .order("event_type")
     .order("sort_order", { ascending: false })
     .order("event_date", { ascending: false, nullsFirst: false });
@@ -32,8 +41,25 @@ export async function GET(req: Request) {
     );
   }
 
+  const { data: deletedRows, error: deletedError } = await supabase
+    .from("events")
+    .select("*")
+    .not("deleted_at", "is", null)
+    .gte("deleted_at", deletedCutoff)
+    .order("deleted_at", { ascending: false });
+
+  if (deletedError) {
+    const formatted = formatSupabaseEventsError(deletedError.message);
+    return NextResponse.json(
+      { error: formatted.message, code: formatted.code },
+      { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+    );
+  }
+
   return NextResponse.json({
     events: (data ?? []).map((r) => mapRow(r as Record<string, unknown>)),
+    deletedEvents: (deletedRows ?? []).map((r) => mapRow(r as Record<string, unknown>)),
+    softDeleteDays: 7,
   });
 }
 

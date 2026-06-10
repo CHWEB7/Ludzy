@@ -12,6 +12,10 @@ import {
   toTimeInputValue,
 } from "@/lib/event-date-format";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
+import {
+  EVENT_SOFT_DELETE_DAYS,
+  formatEventPurgeDate,
+} from "@/lib/event-soft-delete";
 import type { EventRecord } from "@/lib/events-db";
 
 type EventForm = {
@@ -62,6 +66,7 @@ export function AdminEventsPanel() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [events, setEvents] = useState<EventRecord[]>([]);
+  const [deletedEvents, setDeletedEvents] = useState<EventRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<EventForm>(emptyForm);
@@ -106,6 +111,7 @@ export function AdminEventsPanel() {
       const res = await fetch("/api/admin/events", { headers });
       const json = (await res.json()) as {
         events?: EventRecord[];
+        deletedEvents?: EventRecord[];
         error?: string;
         code?: string;
       };
@@ -113,11 +119,13 @@ export function AdminEventsPanel() {
         if (json.code === "TABLE_MISSING") {
           setError(null);
           setEvents([]);
+          setDeletedEvents([]);
           return;
         }
         throw new Error(json.error ?? "Failed to load events");
       }
       setEvents(json.events ?? []);
+      setDeletedEvents(json.deletedEvents ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
@@ -332,6 +340,33 @@ export function AdminEventsPanel() {
     }
   }
 
+  async function handleRestore(id: string) {
+    const target = deletedEvents.find((event) => event.id === id);
+    if (!target) return;
+    if (!confirm(`Restore "${target.title}"?\n\nIt will return to your event list as a draft.`)) {
+      return;
+    }
+
+    try {
+      const headers = await authHeaders();
+      const res = await fetch(`/api/admin/events/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ restore: true }),
+      });
+      const json = (await res.json()) as { event?: EventRecord; error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Restore failed");
+
+      setDeletedEvents((current) => current.filter((event) => event.id !== id));
+      if (json.event) {
+        setEvents((current) => [json.event as EventRecord, ...current]);
+      }
+      await loadEvents({ silent: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Restore failed");
+    }
+  }
+
   const previousEvents = events.filter((e) => e.event_type === "previous");
   const upcomingEvents = events.filter((e) => e.event_type === "upcoming");
 
@@ -538,9 +573,12 @@ export function AdminEventsPanel() {
         </form>
 
         <div>
-          <p className="mb-6 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">
-            All events
-          </p>
+          <div className="mb-6 flex items-center gap-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">
+              All events
+            </p>
+            <SoftDeleteInfoIcon />
+          </div>
           {loading ? (
             <p className="text-sm text-white/40">Loading…</p>
           ) : events.length === 0 ? (
@@ -591,9 +629,66 @@ export function AdminEventsPanel() {
               </div>
             </div>
           )}
+
+          <details className="mt-8 border border-white/10 bg-black/30">
+            <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-[11px] font-bold uppercase tracking-[0.2em] text-white/45 marker:content-none [&::-webkit-details-marker]:hidden">
+              <span>Deleted events ({deletedEvents.length})</span>
+              <SoftDeleteInfoIcon />
+            </summary>
+            <div className="border-t border-white/10 px-4 py-4">
+              {deletedEvents.length === 0 ? (
+                <p className="text-sm text-white/35">
+                  No recently deleted events. Deleted items appear here for {EVENT_SOFT_DELETE_DAYS} days.
+                </p>
+              ) : (
+                <ul className="space-y-3">
+                  {deletedEvents.map((ev) => (
+                    <li key={ev.id} className="border border-white/10 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.2em] text-rose-300/70">
+                            Deleted · {ev.event_type}
+                          </p>
+                          <p className="font-semibold text-white/80">{ev.title}</p>
+                          <p className="text-xs text-white/45">{ev.date_display}</p>
+                          {ev.deleted_at && (
+                            <p className="mt-2 text-[10px] text-white/35">
+                              Permanently removed after {formatEventPurgeDate(ev.deleted_at)}
+                            </p>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => void handleRestore(ev.id)}
+                          className="shrink-0 text-[10px] uppercase tracking-[0.15em] text-emerald-300/80 hover:text-emerald-200"
+                        >
+                          Restore
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </details>
         </div>
       </div>
     </div>
+  );
+}
+
+function SoftDeleteInfoIcon() {
+  const label = `Deleting removes an event from the website straight away. It is kept in the database for ${EVENT_SOFT_DELETE_DAYS} days, then permanently removed. You can restore it from Deleted events during that time.`;
+
+  return (
+    <span
+      className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-white/20 text-[10px] font-bold leading-none text-white/45"
+      title={label}
+      aria-label={label}
+      role="img"
+    >
+      i
+    </span>
   );
 }
 
@@ -629,7 +724,13 @@ function DeleteEventDialog({
           {title}
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-white/50">
-          This permanently removes only this event. Type <strong className="text-white/80">delete</strong> to confirm.
+          This removes the event from the website immediately. It stays in the database for{" "}
+          {EVENT_SOFT_DELETE_DAYS} days under <strong className="text-white/80">Deleted events</strong>, then is
+          permanently removed. Type <strong className="text-white/80">delete</strong> to confirm.
+        </p>
+        <p className="mt-3 flex items-start gap-2 text-xs text-white/40">
+          <SoftDeleteInfoIcon />
+          <span>Only this event is affected. Others stay unchanged.</span>
         </p>
         <input
           type="text"

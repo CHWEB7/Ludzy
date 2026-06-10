@@ -28,6 +28,7 @@ export type EventRecord = {
   gallery_images: string[];
   published: boolean;
   sort_order: number;
+  deleted_at: string | null;
 };
 
 export function mapRow(row: Record<string, unknown>): EventRecord {
@@ -54,6 +55,7 @@ export function mapRow(row: Record<string, unknown>): EventRecord {
       : [],
     published: Boolean(row.published),
     sort_order: Number(row.sort_order ?? 0),
+    deleted_at: row.deleted_at ? String(row.deleted_at) : null,
   };
 }
 
@@ -98,6 +100,7 @@ export async function fetchPublishedEvents(): Promise<{
     .from("events")
     .select("*")
     .eq("published", true)
+    .is("deleted_at", null)
     .order("sort_order", { ascending: false })
     .order("event_date", { ascending: false, nullsFirst: false });
 
@@ -135,6 +138,7 @@ export async function fetchPreviousEventBySlug(
     .from("events")
     .select("*")
     .eq("published", true)
+    .is("deleted_at", null)
     .eq("event_type", "previous")
     .eq("slug", slug)
     .maybeSingle();
@@ -146,6 +150,7 @@ export async function fetchPreviousEventBySlug(
     .from("events")
     .select("*")
     .eq("published", true)
+    .is("deleted_at", null)
     .eq("event_type", "previous")
     .eq("id", slug)
     .maybeSingle();

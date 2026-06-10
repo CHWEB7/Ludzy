@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { slugify } from "@/lib/events-db";
+import { mapRow, slugify } from "@/lib/events-db";
 import { formatBritishLongDate } from "@/lib/event-date-format";
 import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
 import { revalidatePublicEventsPages } from "@/lib/revalidate-events";
@@ -21,6 +21,56 @@ export async function PATCH(req: Request, { params }: Props) {
   }
 
   const body = (await req.json()) as Record<string, unknown>;
+
+  if (body.restore === true) {
+    const { data: existing, error: fetchError } = await supabase
+      .from("events")
+      .select("id, deleted_at, slug, event_type")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (fetchError || !existing) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+    if (!existing.deleted_at) {
+      return NextResponse.json({ error: "Event is not deleted" }, { status: 400 });
+    }
+
+    const { data: restored, error: restoreError } = await supabase
+      .from("events")
+      .update({ deleted_at: null })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (restoreError) {
+      const formatted = formatSupabaseEventsError(restoreError.message);
+      return NextResponse.json(
+        { error: formatted.message, code: formatted.code },
+        { status: formatted.code === "TABLE_MISSING" ? 503 : 500 },
+      );
+    }
+
+    revalidatePublicEventsPages(
+      restored.event_type === "previous" ? (restored.slug as string | null) : null,
+    );
+
+    return NextResponse.json({ event: mapRow(restored as Record<string, unknown>) });
+  }
+
+  const { data: activeCheck } = await supabase
+    .from("events")
+    .select("deleted_at")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (!activeCheck) {
+    return NextResponse.json({ error: "Event not found" }, { status: 404 });
+  }
+  if (activeCheck.deleted_at) {
+    return NextResponse.json({ error: "Restore this event before editing it" }, { status: 400 });
+  }
+
   const eventType = body.event_type as string | undefined;
 
   const updates: Record<string, unknown> = {};
@@ -153,19 +203,25 @@ export async function DELETE(req: Request, { params }: Props) {
 
   const { data: existing } = await supabase
     .from("events")
-    .select("slug, event_type")
+    .select("slug, event_type, deleted_at")
     .eq("id", id)
     .maybeSingle();
 
   if (!existing) {
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
+  if (existing.deleted_at) {
+    return NextResponse.json({ error: "Event is already deleted" }, { status: 400 });
+  }
 
-  const { data: deleted, error } = await supabase
+  const deletedAt = new Date().toISOString();
+  const { data: softDeleted, error } = await supabase
     .from("events")
-    .delete()
+    .update({ deleted_at: deletedAt, published: false })
     .eq("id", id)
-    .select("id");
+    .is("deleted_at", null)
+    .select("id, slug, event_type, deleted_at")
+    .maybeSingle();
 
   if (error) {
     const formatted = formatSupabaseEventsError(error.message);
@@ -175,7 +231,7 @@ export async function DELETE(req: Request, { params }: Props) {
     );
   }
 
-  if (!deleted || deleted.length !== 1) {
+  if (!softDeleted) {
     return NextResponse.json({ error: "Event could not be deleted" }, { status: 404 });
   }
 
@@ -183,5 +239,10 @@ export async function DELETE(req: Request, { params }: Props) {
     existing.event_type === "previous" ? existing.slug : null,
   );
 
-  return NextResponse.json({ ok: true, id });
+  return NextResponse.json({
+    ok: true,
+    id,
+    deleted_at: softDeleted.deleted_at,
+    softDeleteDays: 7,
+  });
 }

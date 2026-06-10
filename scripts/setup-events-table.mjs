@@ -12,6 +12,7 @@ import { ENV_LOCAL_PATH, loadEnvLocal } from "./load-env-local.mjs";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const schemaSqlPath = join(__dirname, "..", "supabase", "events-schema-minimal.sql");
 const gallerySqlPath = join(__dirname, "..", "supabase", "events-gallery-migration.sql");
+const softDeleteSqlPath = join(__dirname, "..", "supabase", "events-soft-delete-migration.sql");
 
 const PLACEHOLDERS = new Set([
   "your_new_password_here",
@@ -55,6 +56,9 @@ async function connectAndSetup(connectionString) {
 
     const gallerySql = readFileSync(gallerySqlPath, "utf8");
     await client.query(gallerySql);
+
+    const softDeleteSql = readFileSync(softDeleteSqlPath, "utf8");
+    await client.query(softDeleteSql);
 
     const check = await client.query("select to_regclass('public.events') as events_table");
     const gallery = await client.query(`

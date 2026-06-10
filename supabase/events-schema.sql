@@ -23,7 +23,8 @@ create table if not exists public.events (
   image_url text,
   gallery_images jsonb not null default '[]'::jsonb,
   published boolean not null default false,
-  sort_order int not null default 0
+  sort_order int not null default 0,
+  deleted_at timestamptz
 );
 
 create index if not exists events_type_published_idx
@@ -35,7 +36,7 @@ drop policy if exists "Public read published events" on public.events;
 create policy "Public read published events"
   on public.events for select
   to anon, authenticated
-  using (published = true);
+  using (published = true and deleted_at is null);
 
 -- Writes go through API using service_role (after MFA-verified admin session check)
 
