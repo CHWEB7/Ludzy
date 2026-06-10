@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { slugify } from "@/lib/events-db";
+import { slugify, mapRow } from "@/lib/events-db";
 import { formatSupabaseEventsError } from "@/lib/supabase/table-errors";
 import { formatBritishLongDate } from "@/lib/event-date-format";
 import { revalidatePublicEventsPages } from "@/lib/revalidate-events";
@@ -32,7 +32,9 @@ export async function GET(req: Request) {
     );
   }
 
-  return NextResponse.json({ events: data ?? [] });
+  return NextResponse.json({
+    events: (data ?? []).map((r) => mapRow(r as Record<string, unknown>)),
+  });
 }
 
 export async function POST(req: Request) {
@@ -83,6 +85,9 @@ export async function POST(req: Request) {
     details: body.details ? String(body.details) : null,
     body: Array.isArray(body.body) ? body.body : [],
     image_url: body.image_url ? String(body.image_url) : null,
+    gallery_images: Array.isArray(body.gallery_images)
+      ? body.gallery_images.map(String)
+      : [],
     published: Boolean(body.published),
     sort_order: Number(body.sort_order ?? 0),
   };

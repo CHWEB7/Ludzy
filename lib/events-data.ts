@@ -5,6 +5,8 @@ export type PreviousEvent = {
   venue: string;
   excerpt: string;
   body: string[];
+  imageUrl?: string;
+  galleryImages?: string[];
 };
 
 export type UpcomingEvent = {

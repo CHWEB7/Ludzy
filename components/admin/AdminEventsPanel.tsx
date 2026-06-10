@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { AdminEventsSetup } from "@/components/admin/AdminEventsSetup";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { LocationPicker } from "@/components/admin/LocationPicker";
 import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
@@ -10,7 +11,6 @@ import {
   toDateInputValue,
   toTimeInputValue,
 } from "@/lib/event-date-format";
-import { EVENTS_TABLE_SETUP_MESSAGE } from "@/lib/supabase/table-errors";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 import type { EventRecord } from "@/lib/events-db";
 
@@ -29,6 +29,7 @@ type EventForm = {
   details: string;
   body: string;
   image_url: string;
+  gallery_images: string[];
   published: boolean;
 };
 
@@ -47,6 +48,7 @@ const emptyForm: EventForm = {
   details: "",
   body: "",
   image_url: "",
+  gallery_images: [],
   published: false,
 };
 
@@ -66,7 +68,6 @@ export function AdminEventsPanel() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [setupRequired, setSetupRequired] = useState(false);
 
   const authHeaders = useCallback(async () => {
     const token = await getAccessToken();
@@ -106,14 +107,12 @@ export function AdminEventsPanel() {
       };
       if (!res.ok) {
         if (json.code === "TABLE_MISSING") {
-          setSetupRequired(true);
           setError(null);
           setEvents([]);
           return;
         }
         throw new Error(json.error ?? "Failed to load events");
       }
-      setSetupRequired(false);
       setEvents(json.events ?? []);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
@@ -160,11 +159,12 @@ export function AdminEventsPanel() {
       details: event.details ?? "",
       body: event.body.join("\n\n"),
       image_url: event.image_url ?? "",
+      gallery_images: event.gallery_images ?? [],
       published: event.published,
     });
   }
 
-  async function handleUpload(file: File) {
+  async function handleUpload(file: File, target: "cover" | "gallery" = "cover") {
     setUploading(true);
     setError(null);
     try {
@@ -179,12 +179,26 @@ export function AdminEventsPanel() {
       });
       const json = (await res.json()) as { url?: string; error?: string };
       if (!res.ok) throw new Error(json.error ?? "Upload failed");
-      setForm((f) => ({ ...f, image_url: json.url ?? "" }));
+      if (target === "gallery") {
+        setForm((f) => ({
+          ...f,
+          gallery_images: json.url ? [...f.gallery_images, json.url] : f.gallery_images,
+        }));
+      } else {
+        setForm((f) => ({ ...f, image_url: json.url ?? "" }));
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
     } finally {
       setUploading(false);
     }
+  }
+
+  function removeGalleryImage(index: number) {
+    setForm((f) => ({
+      ...f,
+      gallery_images: f.gallery_images.filter((_, i) => i !== index),
+    }));
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -226,6 +240,23 @@ export function AdminEventsPanel() {
     }
   }
 
+  async function handleArchive(id: string) {
+    if (!confirm("Move this upcoming event to previous events?")) return;
+    try {
+      const headers = await authHeaders();
+      const res = await fetch(`/api/admin/events/${id}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ archive: true }),
+      });
+      const json = (await res.json()) as { error?: string };
+      if (!res.ok) throw new Error(json.error ?? "Archive failed");
+      await loadEvents();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Archive failed");
+    }
+  }
+
   async function handleDelete(id: string) {
     if (!confirm("Delete this event permanently?")) return;
     try {
@@ -261,21 +292,7 @@ export function AdminEventsPanel() {
         </button>
       </div>
 
-      {setupRequired && (
-        <div className="mb-6 space-y-4 rounded border border-amber-500/30 bg-amber-950/30 px-4 py-4 text-sm text-amber-100/90">
-          <p>{EVENTS_TABLE_SETUP_MESSAGE}</p>
-          <ol className="list-decimal space-y-2 pl-5 text-amber-100/75">
-            <li>Open your Supabase project → <strong className="text-amber-100">SQL Editor</strong></li>
-            <li>Paste and run the file <code className="text-amber-50">supabase/events-schema.sql</code> from this repo</li>
-            <li>In Supabase → <strong className="text-amber-100">Table Editor</strong>, confirm you see an <code className="text-amber-50">events</code> table</li>
-            <li>Refresh this page (wait ~30 seconds after running SQL if it still errors)</li>
-          </ol>
-          <p className="text-xs text-amber-200/60">
-            Use the same Supabase project as your Vercel env vars{" "}
-            <code className="text-amber-50">NEXT_PUBLIC_SUPABASE_URL</code>.
-          </p>
-        </div>
-      )}
+      <AdminEventsSetup onReady={() => void loadEvents()} />
 
       {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
 
@@ -379,12 +396,63 @@ export function AdminEventsPanel() {
 
           <label className="block text-xs text-white/50">
             Cover image
-            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleUpload(f); }} className="mt-1 text-sm text-white/60" />
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void handleUpload(f, "cover");
+              }}
+              className="mt-1 text-sm text-white/60"
+            />
             {uploading && <span className="ml-2 text-xs text-white/40">Uploading…</span>}
             {form.image_url && (
-              <p className="mt-2 truncate text-xs text-emerald-400/80">{form.image_url}</p>
+              <div className="mt-2 space-y-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={form.image_url}
+                  alt=""
+                  className="h-24 w-full max-w-xs object-cover brightness-90"
+                />
+                <p className="truncate text-xs text-emerald-400/80">{form.image_url}</p>
+              </div>
             )}
           </label>
+
+          {form.event_type === "previous" && (
+            <div className="block text-xs text-white/50">
+              <span>Gallery images (shown on recap page only)</span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                onChange={(e) => {
+                  const files = Array.from(e.target.files ?? []);
+                  for (const file of files) void handleUpload(file, "gallery");
+                  e.target.value = "";
+                }}
+                className="mt-1 text-sm text-white/60"
+              />
+              {form.gallery_images.length > 0 && (
+                <ul className="mt-3 space-y-2">
+                  {form.gallery_images.map((url, index) => (
+                    <li key={`${url}-${index}`} className="flex items-center gap-3">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="" className="h-12 w-16 object-cover brightness-90" />
+                      <p className="min-w-0 flex-1 truncate text-[10px] text-white/45">{url}</p>
+                      <button
+                        type="button"
+                        onClick={() => removeGalleryImage(index)}
+                        className="shrink-0 text-[10px] uppercase tracking-[0.15em] text-rose-400/70 hover:text-rose-300"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           <label className="flex items-center gap-2 text-xs text-white/60">
             <input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} />
@@ -416,7 +484,12 @@ export function AdminEventsPanel() {
                   <ul className="space-y-3">
                     {upcomingEvents.map((ev) => (
                       <li key={ev.id} className="border border-white/10 p-4">
-                        <EventListItem ev={ev} onEdit={startEdit} onDelete={handleDelete} />
+                        <EventListItem
+                          ev={ev}
+                          onEdit={startEdit}
+                          onArchive={handleArchive}
+                          onDelete={handleDelete}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -432,7 +505,12 @@ export function AdminEventsPanel() {
                   <ul className="space-y-3">
                     {previousEvents.map((ev) => (
                       <li key={ev.id} className="border border-white/10 p-4">
-                        <EventListItem ev={ev} onEdit={startEdit} onDelete={handleDelete} />
+                        <EventListItem
+                          ev={ev}
+                          onEdit={startEdit}
+                          onArchive={handleArchive}
+                          onDelete={handleDelete}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -449,10 +527,12 @@ export function AdminEventsPanel() {
 function EventListItem({
   ev,
   onEdit,
+  onArchive,
   onDelete,
 }: {
   ev: EventRecord;
   onEdit: (event: EventRecord) => void;
+  onArchive: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
   return (
@@ -464,7 +544,16 @@ function EventListItem({
         <p className="font-semibold text-white/90">{ev.title}</p>
         <p className="text-xs text-white/45">{ev.date_display}</p>
       </div>
-      <div className="flex shrink-0 gap-2">
+      <div className="flex shrink-0 flex-wrap justify-end gap-2">
+        {ev.event_type === "upcoming" && (
+          <button
+            type="button"
+            onClick={() => void onArchive(ev.id)}
+            className="text-[10px] uppercase tracking-[0.15em] text-amber-300/80 hover:text-amber-200"
+          >
+            Archive
+          </button>
+        )}
         <button
           type="button"
           onClick={() => onEdit(ev)}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EventCoverImage } from "@/components/EventCoverImage";
+import { EventGalleryDeck } from "@/components/EventGalleryDeck";
 import {
   fetchPreviousEventBySlug,
   resolvePreviousEventForSlug,
@@ -39,10 +40,10 @@ export default async function PreviousEventPage({ params }: Props) {
             </ol>
           </nav>
 
-          {dbEvent?.image_url && (
+          {event.imageUrl && (
             <div className="relative mb-10 aspect-[16/9] w-full overflow-hidden">
               <EventCoverImage
-                src={dbEvent.image_url}
+                src={event.imageUrl}
                 alt=""
                 className="h-full w-full object-cover brightness-75"
                 priority
@@ -62,6 +63,10 @@ export default async function PreviousEventPage({ params }: Props) {
           <div className="mt-10 space-y-6">
             {event.body.map((paragraph, i) => (<p key={i} className="text-base leading-relaxed text-white/55">{paragraph}</p>))}
           </div>
+
+          {event.galleryImages && event.galleryImages.length > 0 && (
+            <EventGalleryDeck images={event.galleryImages} alt={event.title} />
+          )}
           <div className="mt-16 flex items-center justify-between border-t border-white/10 pt-10">
             <Link href="/events" className="test-btn-ghost inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]">← All events</Link>
             <Link href="/contact" className="test-btn-primary inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]">Book Ludzy</Link>

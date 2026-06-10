@@ -42,14 +42,12 @@ export default async function EventsPage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">Archive</p>
           <h2 className="mt-3 font-display text-2xl font-bold uppercase tracking-[-0.01em] text-white md:text-3xl">Previous events</h2>
           <div className="mt-10 grid gap-px bg-white/10 md:grid-cols-2">
-            {previous.map((event) => {
-              const dbRow = fromDb?.previous.find((r) => (r.slug ?? r.id) === event.slug);
-              return (
+            {previous.map((event) => (
                 <Link key={event.slug} href={`/events/${event.slug}`} className="group relative flex flex-col justify-between bg-black p-8 transition hover:bg-white/[0.03] md:p-10">
-                  {dbRow?.image_url && (
+                  {event.imageUrl && (
                     <div className="relative mb-6 aspect-[16/9] w-full overflow-hidden">
                       <EventCoverImage
-                        src={dbRow.image_url}
+                        src={event.imageUrl}
                         alt=""
                         className="h-full w-full object-cover brightness-75"
                       />
@@ -66,8 +64,7 @@ export default async function EventsPage() {
                     <svg className="h-3 w-3 transition-transform group-hover:translate-x-1" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2.5 6h7M6.5 2.5 10 6l-3.5 3.5" /></svg>
                   </span>
                 </Link>
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>

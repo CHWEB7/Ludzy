@@ -45,6 +45,11 @@ export async function PATCH(req: Request, { params }: Props) {
   if (body.details !== undefined) updates.details = body.details || null;
   if (body.body !== undefined) updates.body = Array.isArray(body.body) ? body.body : [];
   if (body.image_url !== undefined) updates.image_url = body.image_url || null;
+  if (body.gallery_images !== undefined) {
+    updates.gallery_images = Array.isArray(body.gallery_images)
+      ? body.gallery_images.map(String)
+      : [];
+  }
   if (body.published !== undefined) updates.published = Boolean(body.published);
   if (body.sort_order !== undefined) updates.sort_order = Number(body.sort_order);
 
@@ -54,6 +59,33 @@ export async function PATCH(req: Request, { params }: Props) {
     if (slugInput || title) {
       updates.slug = slugInput || (title ? slugify(title) : undefined);
     }
+  }
+
+  if (body.archive === true) {
+    const { data: existing, error: fetchError } = await supabase
+      .from("events")
+      .select("event_type, title, slug, venue, location, excerpt, summary")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (fetchError || !existing) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+    if (existing.event_type !== "upcoming") {
+      return NextResponse.json({ error: "Only upcoming events can be archived" }, { status: 400 });
+    }
+
+    updates.event_type = "previous";
+    updates.slug = existing.slug?.trim() || slugify(String(existing.title));
+    updates.venue = existing.venue || existing.location || null;
+    updates.excerpt =
+      existing.excerpt || existing.summary || String(existing.title);
+    if (!Array.isArray(updates.body)) {
+      updates.body = [];
+    }
+    updates.time_display = null;
+    updates.set_type = null;
+    updates.details = null;
   }
 
   const { data, error } = await supabase

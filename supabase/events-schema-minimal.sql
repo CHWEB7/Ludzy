@@ -20,6 +20,7 @@ create table if not exists public.events (
   details text,
   body jsonb not null default '[]'::jsonb,
   image_url text,
+  gallery_images jsonb not null default '[]'::jsonb,
   published boolean not null default false,
   sort_order int not null default 0
 );

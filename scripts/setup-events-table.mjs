@@ -10,7 +10,8 @@ import pg from "pg";
 import { ENV_LOCAL_PATH, loadEnvLocal } from "./load-env-local.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const sqlPath = join(__dirname, "..", "supabase", "events-schema-minimal.sql");
+const schemaSqlPath = join(__dirname, "..", "supabase", "events-schema-minimal.sql");
+const gallerySqlPath = join(__dirname, "..", "supabase", "events-gallery-migration.sql");
 
 const PLACEHOLDERS = new Set([
   "your_new_password_here",
@@ -49,10 +50,29 @@ async function connectAndSetup(connectionString) {
   });
   await client.connect();
   try {
-    const sql = readFileSync(sqlPath, "utf8");
-    await client.query(sql);
+    const schemaSql = readFileSync(schemaSqlPath, "utf8");
+    await client.query(schemaSql);
+
+    const gallerySql = readFileSync(gallerySqlPath, "utf8");
+    await client.query(gallerySql);
+
     const check = await client.query("select to_regclass('public.events') as events_table");
-    return check.rows[0]?.events_table === "events";
+    const gallery = await client.query(`
+      select column_name
+      from information_schema.columns
+      where table_schema = 'public'
+        and table_name = 'events'
+        and column_name = 'gallery_images'
+    `);
+    const bucket = await client.query(`
+      select public from storage.buckets where id = 'event-images'
+    `);
+
+    return (
+      check.rows[0]?.events_table === "events" &&
+      gallery.rows.length > 0 &&
+      bucket.rows[0]?.public === true
+    );
   } finally {
     await client.end();
   }
@@ -84,7 +104,7 @@ for (let i = 0; i < connectionStrings.length; i++) {
     console.log(`Connecting (method ${i + 1}/${connectionStrings.length})…`);
     const ok = await connectAndSetup(connectionStrings[i]);
     if (ok) {
-      console.log("Success: public.events table is ready.");
+      console.log("Success: events table, gallery_images column, and public image bucket are ready.");
       process.exit(0);
     }
     console.error("SQL ran but events table was not found.");

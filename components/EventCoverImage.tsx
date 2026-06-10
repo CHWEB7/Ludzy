@@ -20,6 +20,7 @@ export function EventCoverImage({
       className={className}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
+      referrerPolicy="no-referrer"
     />
   );
 }

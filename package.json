@@ -9,6 +9,7 @@
     "lint": "next lint",
     "create-admin": "node --env-file=.env.local scripts/create-admin-user.mjs",
     "setup-events": "node scripts/setup-events-table.mjs",
+    "migrate-gallery": "node scripts/run-gallery-migration.mjs",
     "diagnose-env": "node scripts/diagnose-env.mjs"
   },
   "dependencies": {

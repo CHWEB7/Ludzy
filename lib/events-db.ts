@@ -1,4 +1,5 @@
 import { googleMapsSearchUrl } from "@/lib/event-date-format";
+import { resolveEventImageUrl, resolveEventImageUrls } from "@/lib/event-image-url";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
   previousEvents,
@@ -24,11 +25,12 @@ export type EventRecord = {
   details: string | null;
   body: string[];
   image_url: string | null;
+  gallery_images: string[];
   published: boolean;
   sort_order: number;
 };
 
-function mapRow(row: Record<string, unknown>): EventRecord {
+export function mapRow(row: Record<string, unknown>): EventRecord {
   const body = row.body;
   return {
     id: String(row.id),
@@ -47,6 +49,9 @@ function mapRow(row: Record<string, unknown>): EventRecord {
     details: row.details ? String(row.details) : null,
     body: Array.isArray(body) ? body.map(String) : [],
     image_url: row.image_url ? String(row.image_url) : null,
+    gallery_images: Array.isArray(row.gallery_images)
+      ? row.gallery_images.map(String)
+      : [],
     published: Boolean(row.published),
     sort_order: Number(row.sort_order ?? 0),
   };
@@ -60,6 +65,8 @@ export function toPreviousEvent(e: EventRecord): PreviousEvent {
     venue: e.venue ?? "",
     excerpt: e.excerpt ?? "",
     body: e.body.length > 0 ? e.body : [e.summary ?? ""].filter(Boolean),
+    imageUrl: resolveEventImageUrl(e.image_url),
+    galleryImages: resolveEventImageUrls(e.gallery_images),
   };
 }
 
@@ -72,7 +79,7 @@ export function toUpcomingEvent(e: EventRecord): UpcomingEvent {
     time: e.time_display ?? "",
     location,
     mapsUrl: e.maps_url ?? (location ? googleMapsSearchUrl(location) : undefined),
-    imageUrl: e.image_url ?? undefined,
+    imageUrl: resolveEventImageUrl(e.image_url),
     setType: e.set_type ?? "",
     summary: e.summary ?? e.excerpt ?? "",
     details: e.details ?? "",
@@ -123,7 +130,7 @@ export async function fetchPreviousEventBySlug(
   const supabase = createServerSupabase();
   if (!supabase) return null;
 
-  const { data, error } = await supabase
+  const { data: bySlug, error: slugError } = await supabase
     .from("events")
     .select("*")
     .eq("published", true)
@@ -131,8 +138,19 @@ export async function fetchPreviousEventBySlug(
     .eq("slug", slug)
     .maybeSingle();
 
-  if (error || !data) return null;
-  return mapRow(data as Record<string, unknown>);
+  if (slugError) return null;
+  if (bySlug) return mapRow(bySlug as Record<string, unknown>);
+
+  const { data: byId, error: idError } = await supabase
+    .from("events")
+    .select("*")
+    .eq("published", true)
+    .eq("event_type", "previous")
+    .eq("id", slug)
+    .maybeSingle();
+
+  if (idError || !byId) return null;
+  return mapRow(byId as Record<string, unknown>);
 }
 
 /** Fallback when Supabase is not configured. */

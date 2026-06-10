@@ -21,6 +21,7 @@ create table if not exists public.events (
   details text,
   body jsonb not null default '[]'::jsonb,
   image_url text,
+  gallery_images jsonb not null default '[]'::jsonb,
   published boolean not null default false,
   sort_order int not null default 0
 );
@@ -55,7 +56,7 @@ create trigger events_updated_at
 -- ─── Storage bucket for event images ───
 insert into storage.buckets (id, name, public)
 values ('event-images', 'event-images', true)
-on conflict (id) do nothing;
+on conflict (id) do update set public = true;
 
 drop policy if exists "Public read event images" on storage.objects;
 create policy "Public read event images"
@@ -68,5 +69,6 @@ create policy "Public read event images"
 grant select on table public.events to anon, authenticated, service_role;
 grant all on table public.events to service_role;
 
--- Refresh PostgREST schema cache (fixes "table not found in schema cache" right after create)
+grant usage on schema public to anon, authenticated, service_role;
+
 notify pgrst, 'reload schema';

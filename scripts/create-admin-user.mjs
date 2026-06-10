@@ -69,7 +69,6 @@ if (error) {
     console.log("\nTo reset the password, use Supabase Dashboard → Authentication → Users.");
     console.log("\nEnsure this email is in your allowlist:");
     console.log(`  ADMIN_EMAILS=${email}`);
-    console.log(`  NEXT_PUBLIC_ADMIN_EMAILS=${email}`);
     process.exit(0);
   }
   console.error("Failed to create user:", error.message);
@@ -81,7 +80,6 @@ console.log("  Email:    ", email);
 console.log("  Password: ", password);
 console.log("\nAdd to .env.local and Vercel:");
 console.log(`  ADMIN_EMAILS=${email}`);
-console.log(`  NEXT_PUBLIC_ADMIN_EMAILS=${email}`);
 console.log("\nThen sign in at /admin/login and complete MFA enrolment on first visit.");
 if (data.user?.id) {
   console.log(`\nUser id: ${data.user.id}`);
