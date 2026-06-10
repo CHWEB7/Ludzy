@@ -4,7 +4,6 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import { slugify, mapRow } from "@/lib/events-db";
 import {
   EVENT_SOFT_DELETE_DAYS,
-  applyActiveEventFilter,
   getEventSoftDeleteCutoffIso,
   purgeExpiredDeletedEvents,
   supportsEventSoftDelete,
@@ -30,13 +29,20 @@ export async function GET(req: Request) {
     await purgeExpiredDeletedEvents(supabase);
   }
 
-  const { data, error } = await applyActiveEventFilter(
-    supabase.from("events").select("*"),
-    softDeleteEnabled,
-  )
-    .order("event_type")
-    .order("sort_order", { ascending: false })
-    .order("event_date", { ascending: false, nullsFirst: false });
+  const { data, error } = softDeleteEnabled
+    ? await supabase
+        .from("events")
+        .select("*")
+        .is("deleted_at", null)
+        .order("event_type")
+        .order("sort_order", { ascending: false })
+        .order("event_date", { ascending: false, nullsFirst: false })
+    : await supabase
+        .from("events")
+        .select("*")
+        .order("event_type")
+        .order("sort_order", { ascending: false })
+        .order("event_date", { ascending: false, nullsFirst: false });
 
   if (error) {
     const formatted = formatSupabaseEventsError(error.message);

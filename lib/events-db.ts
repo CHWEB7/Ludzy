@@ -1,6 +1,6 @@
 import { googleMapsSearchUrl } from "@/lib/event-date-format";
 import { resolveEventImageUrl, resolveEventImageUrls } from "@/lib/event-image-url";
-import { applyActiveEventFilter, supportsEventSoftDelete } from "@/lib/event-soft-delete";
+import { supportsEventSoftDelete } from "@/lib/event-soft-delete";
 import { createServerSupabase } from "@/lib/supabase/server";
 import {
   previousEvents,
@@ -99,12 +99,20 @@ export async function fetchPublishedEvents(): Promise<{
 
   const softDelete = await supportsEventSoftDelete(supabase);
 
-  const { data, error } = await applyActiveEventFilter(
-    supabase.from("events").select("*").eq("published", true),
-    softDelete,
-  )
-    .order("sort_order", { ascending: false })
-    .order("event_date", { ascending: false, nullsFirst: false });
+  const { data, error } = softDelete
+    ? await supabase
+        .from("events")
+        .select("*")
+        .eq("published", true)
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: false })
+        .order("event_date", { ascending: false, nullsFirst: false })
+    : await supabase
+        .from("events")
+        .select("*")
+        .eq("published", true)
+        .order("sort_order", { ascending: false })
+        .order("event_date", { ascending: false, nullsFirst: false });
 
   if (error || !data) return null;
 
@@ -138,28 +146,42 @@ export async function fetchPreviousEventBySlug(
 
   const softDelete = await supportsEventSoftDelete(supabase);
 
-  const { data: bySlug, error: slugError } = await applyActiveEventFilter(
-    supabase
-      .from("events")
-      .select("*")
-      .eq("published", true)
-      .eq("event_type", "previous")
-      .eq("slug", slug),
-    softDelete,
-  ).maybeSingle();
+  const { data: bySlug, error: slugError } = softDelete
+    ? await supabase
+        .from("events")
+        .select("*")
+        .eq("published", true)
+        .is("deleted_at", null)
+        .eq("event_type", "previous")
+        .eq("slug", slug)
+        .maybeSingle()
+    : await supabase
+        .from("events")
+        .select("*")
+        .eq("published", true)
+        .eq("event_type", "previous")
+        .eq("slug", slug)
+        .maybeSingle();
 
   if (slugError) return null;
   if (bySlug) return mapRow(bySlug as Record<string, unknown>);
 
-  const { data: byId, error: idError } = await applyActiveEventFilter(
-    supabase
-      .from("events")
-      .select("*")
-      .eq("published", true)
-      .eq("event_type", "previous")
-      .eq("id", slug),
-    softDelete,
-  ).maybeSingle();
+  const { data: byId, error: idError } = softDelete
+    ? await supabase
+        .from("events")
+        .select("*")
+        .eq("published", true)
+        .is("deleted_at", null)
+        .eq("event_type", "previous")
+        .eq("id", slug)
+        .maybeSingle()
+    : await supabase
+        .from("events")
+        .select("*")
+        .eq("published", true)
+        .eq("event_type", "previous")
+        .eq("id", slug)
+        .maybeSingle();
 
   if (idError || !byId) return null;
   return mapRow(byId as Record<string, unknown>);

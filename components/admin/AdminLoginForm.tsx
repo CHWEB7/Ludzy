@@ -21,10 +21,12 @@ export function AdminLoginForm() {
     if (!allowed) {
       if (reason === "allowlist_not_configured") {
         setError(
-          "Admin allowlist is not configured. Add ADMIN_EMAILS in Vercel (or .env.local) and redeploy.",
+          "Admin allowlist is not configured. Add ADMIN_EMAILS in Vercel (or .env.local for local dev) and redeploy.",
         );
       } else {
-        setError("This email is not authorised for admin access.");
+        setError(
+          "This email is not authorised for admin access. On ludzy.online, ADMIN_EMAILS must be set in Vercel (not only .env.local), include this exact email, then redeploy.",
+        );
       }
       setLoading(false);
       return;

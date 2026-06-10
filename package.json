@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "typecheck": "node scripts/typecheck.mjs",
     "start": "next start",
     "lint": "next lint",
     "create-admin": "node --env-file=.env.local scripts/create-admin-user.mjs",
