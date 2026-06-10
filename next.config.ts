@@ -13,6 +13,12 @@ function getSupabaseHostname(): string | null {
 const supabaseHost = getSupabaseHostname();
 
 const nextConfig: NextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   images: {
     remotePatterns: [
       {

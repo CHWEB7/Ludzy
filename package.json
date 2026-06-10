@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "tsc --noEmit && next build",
+    "build:next": "next build",
     "typecheck": "node scripts/typecheck.mjs",
     "start": "next start",
     "lint": "next lint",
