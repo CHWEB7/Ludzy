@@ -32,7 +32,6 @@ type MixcloudCloudcastsResponse = {
 
 const DEFAULT_USERNAME = "DJ-Ludzy";
 const DEFAULT_LIMIT = 6;
-const REVALIDATE_SECONDS = 3600;
 
 const FALLBACK_SHOWS: MixcloudShow[] = [
   {
@@ -130,18 +129,30 @@ export async function fetchLatestMixcloudShows(
 
   try {
     const res = await fetch(url, {
-      next: { revalidate: REVALIDATE_SECONDS },
-      headers: { Accept: "application/json" },
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "LudzyDJ-Site/1.0 (+https://www.ludzy.online)",
+      },
     });
 
     if (!res.ok) {
-      console.error("[mixcloud] API request failed:", res.status, res.statusText);
+      const body = await res.text().catch(() => "");
+      console.error(
+        "[mixcloud] API request failed:",
+        res.status,
+        res.statusText,
+        body.slice(0, 200),
+      );
       return FALLBACK_SHOWS.slice(0, limit);
     }
 
     const json = (await res.json()) as MixcloudCloudcastsResponse;
     const shows = (json.data ?? []).map(mapCloudcast);
-    if (shows.length === 0) return FALLBACK_SHOWS.slice(0, limit);
+    if (shows.length === 0) {
+      console.warn("[mixcloud] API returned no cloudcasts; using fallback list.");
+      return FALLBACK_SHOWS.slice(0, limit);
+    }
     return shows;
   } catch (error) {
     console.error("[mixcloud] Failed to fetch uploads:", error);

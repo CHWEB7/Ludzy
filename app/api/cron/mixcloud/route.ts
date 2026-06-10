@@ -1,26 +1,27 @@
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { fetchLatestMixcloudShows } from "@/lib/mixcloud";
 
 export async function GET(req: Request) {
   const cronSecret = process.env.CRON_SECRET?.trim();
-  const isProduction = process.env.NODE_ENV === "production";
-
-  if (isProduction && !cronSecret) {
-    return NextResponse.json({ error: "CRON_SECRET is not configured." }, { status: 503 });
-  }
+  const isVercelCron = req.headers.get("x-vercel-cron") === "1";
 
   if (cronSecret) {
     const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${cronSecret}`) {
+    if (auth !== `Bearer ${cronSecret}` && !isVercelCron) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
   }
 
+  const shows = await fetchLatestMixcloudShows();
   revalidatePath("/");
+  revalidatePath("/test");
 
   return NextResponse.json({
     ok: true,
-    revalidated: ["/"],
+    revalidated: ["/", "/test"],
+    showCount: shows.length,
+    latestTitle: shows[0]?.title ?? null,
     at: new Date().toISOString(),
   });
 }

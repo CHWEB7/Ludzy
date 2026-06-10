@@ -3,6 +3,8 @@ import Image from "next/image";
 import { MixcloudListenSection } from "@/components/MixcloudListenSection";
 import { TestScrollCards } from "@/components/TestScrollCards";
 
+export const dynamic = "force-dynamic";
+
 const PEXELS_CROWD =
   "https://images.pexels.com/photos/1105666/pexels-photo-1105666.jpeg?auto=compress&cs=tinysrgb&w=1920&q=80";
 const PEXELS_DJ_BOOTH =
