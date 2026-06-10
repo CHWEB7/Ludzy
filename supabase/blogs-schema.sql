@@ -1,4 +1,13 @@
--- Blogs CMS — run in Supabase → SQL Editor after events-schema.sql
+-- Blogs CMS — run in Supabase → SQL Editor (whole file once).
+
+-- ─── Updated-at helper (safe if events schema already created it) ───
+create or replace function public.set_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
 
 -- ─── Blogs table ───
 create table if not exists public.blogs (
