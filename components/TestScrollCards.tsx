@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRef, useState, useCallback, useEffect } from "react";
 
 type CardItem = {
+  id?: string;
   title: string;
   copy: string;
   img?: string;
@@ -96,7 +97,7 @@ export function TestScrollCards({
         >
           {items.map((item, i) => (
             <article
-              key={item.title}
+              key={item.id ?? item.title}
               className="group relative flex w-[min(85vw,380px)] shrink-0 snap-start flex-col overflow-hidden border border-white/10 bg-black transition-colors hover:border-white/25 md:w-[420px]"
             >
               {variant === "image" && item.img && (

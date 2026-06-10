@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { MixcloudListenSection } from "@/components/MixcloudListenSection";
 import { TestScrollCards } from "@/components/TestScrollCards";
 
 const PEXELS_CROWD =
@@ -40,35 +41,6 @@ const serviceCards = [
     title: "THE PERFORMANCE",
     copy: "Concerts, festivals, warm-up stages, headline slots, multi-room events — high-energy sets built for crowds and big sound systems.",
     img: PEXELS_FESTIVAL,
-  },
-];
-
-function mixcloudEmbed(slug: string) {
-  return `https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=0&feed=${encodeURIComponent(`/DJ-Ludzy/${slug}/`)}`;
-}
-
-const mixCards = [
-  {
-    title: "Chilled Ibiza",
-    copy: "Downtempo edits and soulful vocal cuts — sunset energy for the terrace.",
-    embedUrl: mixcloudEmbed("chilled-ibiza-20260507-183957"),
-    externalUrl:
-      "https://www.mixcloud.com/DJ-Ludzy/chilled-ibiza-20260507-183957/",
-  },
-  {
-    title: "UK Garage — Thursday Night Live",
-    copy: "Soulful garage rollers into classic house — residency energy.",
-    embedUrl: mixcloudEmbed(
-      "uk-garage-thursday-night-live-with-ludzy-20260514-185716",
-    ),
-    externalUrl:
-      "https://www.mixcloud.com/DJ-Ludzy/uk-garage-thursday-night-live-with-ludzy-20260514-185716/",
-  },
-  {
-    title: "Nu Disco Sampler",
-    copy: "Rare groove and nu-disco flavours — polished, bright, feel-good.",
-    embedUrl: mixcloudEmbed("nu-disco-sampler"),
-    externalUrl: "https://www.mixcloud.com/DJ-Ludzy/nu-disco-sampler/",
   },
 ];
 
@@ -163,9 +135,9 @@ export default function HomePage() {
         <TestScrollCards label="Services" heading="What we do" items={serviceCards} variant="image" />
       </div>
 
-      {/* ─── MIXES ─── */}
+      {/* ─── MIXES (auto-synced from Mixcloud) ─── */}
       <div className="border-t border-white/10">
-        <TestScrollCards label="On rotation" heading="Listen" items={mixCards} variant="embed" />
+        <MixcloudListenSection />
       </div>
 
       {/* ─── QUOTE ─── */}
