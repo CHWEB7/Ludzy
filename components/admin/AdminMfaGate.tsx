@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
-import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
+import { verifyAdminAccessToken } from "@/lib/auth/check-admin-email-client";
 
 type Step = "loading" | "enroll" | "verify";
 
@@ -29,12 +29,12 @@ export function AdminMfaGate() {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (!session?.user) {
+      if (!session?.user || !session.access_token) {
         router.replace("/admin/login");
         return;
       }
 
-      if (!(await checkAdminEmailAllowed(session.user.email ?? "")).allowed) {
+      if (!(await verifyAdminAccessToken(session.access_token)).allowed) {
         await supabase.auth.signOut();
         router.replace("/admin/login");
         return;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkAdminEmailAllowed } from "@/lib/auth/check-admin-email-client";
+import { verifyAdminAccessToken } from "@/lib/auth/check-admin-email-client";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 
 export function AdminLoginForm() {
@@ -17,30 +17,36 @@ export function AdminLoginForm() {
     setError(null);
     setLoading(true);
 
-    const { allowed, reason } = await checkAdminEmailAllowed(email);
-    if (!allowed) {
-      if (reason === "allowlist_not_configured") {
-        setError(
-          "Admin allowlist is not configured. Add ADMIN_EMAILS in Vercel (or .env.local for local dev) and redeploy.",
-        );
-      } else {
-        setError(
-          "This email is not authorised for admin access. On ludzy.online, ADMIN_EMAILS must be set in Vercel (not only .env.local), include this exact email, then redeploy.",
-        );
-      }
-      setLoading(false);
-      return;
-    }
-
     try {
       const supabase = createAdminBrowserClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
       });
 
       if (signInError) {
         setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      const accessToken = signInData.session?.access_token;
+      if (!accessToken) {
+        setError("Sign in failed. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      const { allowed, reason } = await verifyAdminAccessToken(accessToken);
+      if (!allowed) {
+        await supabase.auth.signOut();
+        if (reason === "not_authorised") {
+          setError(
+            "This account is not authorised for admin access. Ask the site owner to run npm run grant-admin:events or add ADDITIONAL_ADMIN_EMAILS in Vercel.",
+          );
+        } else {
+          setError("This account is not authorised for admin access.");
+        }
         setLoading(false);
         return;
       }

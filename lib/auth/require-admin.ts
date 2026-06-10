@@ -2,7 +2,7 @@ import { createServerSupabase } from "@/lib/supabase/server";
 import {
   getJwtClaim,
   hasMfaSession,
-  isAdminEmail,
+  isAdminAuthorized,
 } from "@/lib/auth/admin-access";
 import { createAdminServerClient } from "@/lib/supabase/server-admin";
 import type { User } from "@supabase/supabase-js";
@@ -43,7 +43,7 @@ export async function requireAdminAuth(
     accessToken = data.session.access_token;
   }
 
-  if (!isAdminEmail(user.email)) {
+  if (!isAdminAuthorized(user)) {
     return { ok: false, status: 403, error: "Not authorised for admin access" };
   }
 

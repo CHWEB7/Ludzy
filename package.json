@@ -11,6 +11,7 @@
     "lint": "next lint",
     "create-admin": "node --env-file=.env.local scripts/create-admin-user.mjs",
     "create-admin:events": "node --env-file=.env.local scripts/create-admin-user.mjs events",
+    "grant-admin:events": "node --env-file=.env.local scripts/grant-admin-access.mjs events-admin@ludzy.online",
     "setup-events": "node scripts/setup-events-table.mjs",
     "migrate-gallery": "node scripts/run-gallery-migration.mjs",
     "migrate-soft-delete": "node scripts/run-soft-delete-migration.mjs",
