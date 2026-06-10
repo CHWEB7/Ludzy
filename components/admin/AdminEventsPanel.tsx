@@ -11,12 +11,16 @@ import {
   toDateInputValue,
   toTimeInputValue,
 } from "@/lib/event-date-format";
-import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
+import {
+  eventImageUploadHint,
+  prepareEventImageFile,
+} from "@/lib/event-image-prepare";
 import {
   EVENT_SOFT_DELETE_DAYS,
   formatEventPurgeDate,
 } from "@/lib/event-soft-delete";
 import type { EventRecord } from "@/lib/events-db";
+import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 
 type EventForm = {
   event_type: "previous" | "upcoming";
@@ -74,6 +78,7 @@ export function AdminEventsPanel() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -193,12 +198,16 @@ export function AdminEventsPanel() {
 
   async function handleUpload(file: File, target: "cover" | "gallery" = "cover") {
     setUploading(true);
+    setUploadStatus("Optimising image…");
     setError(null);
     try {
+      const prepared = await prepareEventImageFile(file, target);
+      setUploadStatus("Uploading…");
+
       const token = await getAccessToken();
       if (!token) throw new Error("Not signed in");
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", prepared.file);
       const res = await fetch("/api/admin/upload", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
@@ -214,10 +223,21 @@ export function AdminEventsPanel() {
       } else {
         setForm((f) => ({ ...f, image_url: json.url ?? "" }));
       }
+      setUploadStatus(
+        `Uploaded ${prepared.width}×${prepared.height}px (${Math.round(prepared.outputBytes / 1024)} KB)`,
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
+      setUploadStatus(null);
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleGalleryFiles(files: FileList | File[]) {
+    const list = Array.from(files);
+    for (const file of list) {
+      await handleUpload(file, "gallery");
     }
   }
 
@@ -518,24 +538,35 @@ export function AdminEventsPanel() {
 
           <label className="block text-xs text-white/50">
             Cover image
+            <p className="mt-1 text-[10px] leading-relaxed text-white/35">
+              {eventImageUploadHint("cover")} Portrait photos are centre-cropped to fit.
+            </p>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
+              disabled={uploading}
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f) void handleUpload(f, "cover");
+                e.target.value = "";
               }}
-              className="mt-1 text-sm text-white/60"
+              className="mt-1 text-sm text-white/60 disabled:opacity-50"
             />
-            {uploading && <span className="ml-2 text-xs text-white/40">Uploading…</span>}
+            {(uploading || uploadStatus) && (
+              <span className="ml-2 text-xs text-white/40">
+                {uploading ? uploadStatus ?? "Working…" : uploadStatus}
+              </span>
+            )}
             {form.image_url && (
               <div className="mt-2 space-y-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={form.image_url}
-                  alt=""
-                  className="h-24 w-full max-w-xs object-cover brightness-90"
-                />
+                <div className="relative aspect-[16/10] w-full max-w-xs overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={form.image_url}
+                    alt=""
+                    className="h-full w-full object-cover brightness-90"
+                  />
+                </div>
                 <p className="truncate text-xs text-emerald-400/80">{form.image_url}</p>
               </div>
             )}
@@ -544,23 +575,29 @@ export function AdminEventsPanel() {
           {form.event_type === "previous" && (
             <div className="block text-xs text-white/50">
               <span>Gallery images (shown on recap page only)</span>
+              <p className="mt-1 text-[10px] leading-relaxed text-white/35">
+                {eventImageUploadHint("gallery")} Upload one or several at a time.
+              </p>
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
                 multiple
+                disabled={uploading}
                 onChange={(e) => {
                   const files = Array.from(e.target.files ?? []);
-                  for (const file of files) void handleUpload(file, "gallery");
+                  if (files.length > 0) void handleGalleryFiles(files);
                   e.target.value = "";
                 }}
-                className="mt-1 text-sm text-white/60"
+                className="mt-1 text-sm text-white/60 disabled:opacity-50"
               />
               {form.gallery_images.length > 0 && (
                 <ul className="mt-3 space-y-2">
                   {form.gallery_images.map((url, index) => (
                     <li key={`${url}-${index}`} className="flex items-center gap-3">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt="" className="h-12 w-16 object-cover brightness-90" />
+                      <div className="relative h-12 w-20 shrink-0 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" className="h-full w-full object-cover brightness-90" />
+                      </div>
                       <p className="min-w-0 flex-1 truncate text-[10px] text-white/45">{url}</p>
                       <button
                         type="button"

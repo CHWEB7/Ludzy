@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { requireAdminAuth } from "@/lib/auth/require-admin";
 import { getEventImagePublicUrl } from "@/lib/event-image-url";
+import {
+  EVENT_IMAGE_ALLOWED_TYPES,
+  EVENT_IMAGE_MAX_UPLOAD_BYTES,
+  formatBytes,
+} from "@/lib/event-image-limits";
 import { createServerSupabase } from "@/lib/supabase/server";
 
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+const ALLOWED = new Set<string>(EVENT_IMAGE_ALLOWED_TYPES);
 const BUCKET = "event-images";
 
 async function ensurePublicEventImagesBucket(
@@ -45,14 +49,23 @@ export async function POST(req: Request) {
   }
 
   if (!ALLOWED.has(file.type)) {
-    return NextResponse.json({ error: "Only JPEG, PNG, and WebP images allowed" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Only JPEG, PNG, and WebP images allowed" },
+      { status: 400 },
+    );
   }
 
-  if (file.size > MAX_BYTES) {
-    return NextResponse.json({ error: "Image must be under 5 MB" }, { status: 400 });
+  if (file.size > EVENT_IMAGE_MAX_UPLOAD_BYTES) {
+    return NextResponse.json(
+      {
+        error: `Optimised image must be under ${formatBytes(EVENT_IMAGE_MAX_UPLOAD_BYTES)}. Try a smaller photo.`,
+      },
+      { status: 400 },
+    );
   }
 
-  const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+  const ext =
+    file.type === "image/png" ? "png" : file.type === "image/jpeg" ? "jpg" : "webp";
   const path = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
 
   const buffer = Buffer.from(await file.arrayBuffer());
