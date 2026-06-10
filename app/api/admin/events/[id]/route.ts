@@ -213,18 +213,28 @@ export async function DELETE(req: Request, { params }: Props) {
 
   const softDeleteEnabled = await supportsEventSoftDelete(supabase);
 
-  const { data: existing } = await supabase
-    .from("events")
-    .select(softDeleteEnabled ? "slug, event_type, deleted_at" : "slug, event_type")
-    .eq("id", id)
-    .maybeSingle();
+  const existingResult = softDeleteEnabled
+    ? await supabase
+        .from("events")
+        .select("slug, event_type, deleted_at")
+        .eq("id", id)
+        .maybeSingle()
+    : await supabase
+        .from("events")
+        .select("slug, event_type")
+        .eq("id", id)
+        .maybeSingle();
 
-  if (!existing) {
+  const existing = existingResult.data;
+
+  if (existingResult.error || !existing) {
     return NextResponse.json({ error: "Event not found" }, { status: 404 });
   }
 
   if (softDeleteEnabled) {
-    if ("deleted_at" in existing && existing.deleted_at) {
+    const existingDeletedAt =
+      "deleted_at" in existing ? existing.deleted_at : null;
+    if (existingDeletedAt) {
       return NextResponse.json({ error: "Event is already deleted" }, { status: 400 });
     }
 
