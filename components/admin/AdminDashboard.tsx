@@ -98,15 +98,6 @@ export function AdminDashboard() {
           ),
         )}
       </div>
-
-      <div className="mt-10 border-t border-white/10 pt-8">
-        <Link
-          href="/events"
-          className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40 transition hover:text-white"
-        >
-          View public events page →
-        </Link>
-      </div>
     </div>
   );
 }

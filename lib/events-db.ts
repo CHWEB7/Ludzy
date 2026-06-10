@@ -72,6 +72,7 @@ export function toUpcomingEvent(e: EventRecord): UpcomingEvent {
     time: e.time_display ?? "",
     location,
     mapsUrl: e.maps_url ?? (location ? googleMapsSearchUrl(location) : undefined),
+    imageUrl: e.image_url ?? undefined,
     setType: e.set_type ?? "",
     summary: e.summary ?? e.excerpt ?? "",
     details: e.details ?? "",

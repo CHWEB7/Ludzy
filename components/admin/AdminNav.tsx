@@ -36,12 +36,6 @@ export function AdminNav({ title, description }: AdminNavProps) {
         )}
       </div>
       <div className="flex flex-wrap gap-2">
-        <Link
-          href="/events"
-          className="test-btn-ghost px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em]"
-        >
-          View events page
-        </Link>
         <button
           type="button"
           onClick={() => void signOut()}

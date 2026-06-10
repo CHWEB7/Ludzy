@@ -10,7 +10,7 @@ export const adminSections: AdminSection[] = [
   {
     id: "events",
     title: "Events",
-    description: "Manage past recaps and upcoming diary dates on the public events page.",
+    description: "Manage past recaps and upcoming diary dates.",
     href: "/admin/events",
     available: true,
   },
