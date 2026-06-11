@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
-import Script from "next/script";
 import { Dancing_Script, Outfit } from "next/font/google";
+import { ConvoraChatWidget } from "@/components/ConvoraChatWidget";
 import "./globals.css";
 import { TestHeader } from "@/components/TestHeader";
 
@@ -48,13 +48,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-ink antialiased">
         <TestHeader />
         {children}
-        <Script id="convora-widget-config" strategy="lazyOnload">
-          {`window.ConvoraWidget={"phone":"447592262525","brand":"Ludzy","color":"#6B7280","size":"small","buttonText":"Chat with us","shape":"square","message":"Hey! 👋 Got a question about booking or availability? Drop us a message.","prefill":"","brandImage":"https://www.ludzy.online/images/ludzy-logo.png","autoOpen":10,"headerGradient":"linear-gradient(135deg, #374151 0%, #111827 100%)"};`}
-        </Script>
-        <Script
-          src="https://convora.io/api/widget/loader.js"
-          strategy="lazyOnload"
-        />
+        <ConvoraChatWidget />
         <Analytics />
       </body>
     </html>
