@@ -17,6 +17,7 @@ type CardItem = {
 type TestScrollCardsProps = {
   label: string;
   heading: string;
+  intro?: string;
   items: CardItem[];
   variant?: "image" | "embed";
 };
@@ -24,6 +25,7 @@ type TestScrollCardsProps = {
 export function TestScrollCards({
   label,
   heading,
+  intro,
   items,
   variant = "image",
 }: TestScrollCardsProps) {
@@ -66,6 +68,11 @@ export function TestScrollCards({
             <h2 className="mt-3 font-display text-3xl font-bold uppercase leading-[0.95] tracking-[-0.01em] text-white md:text-4xl lg:text-5xl">
               {heading}
             </h2>
+            {intro && (
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
+                {intro}
+              </p>
+            )}
           </div>
           <div className="hidden gap-2 sm:flex">
             <button

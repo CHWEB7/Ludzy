@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MixcloudListenSection } from "@/components/MixcloudListenSection";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SocialSpacesSection } from "@/components/SocialSpacesSection";
 import { TestScrollCards } from "@/components/TestScrollCards";
 
 export const metadata: Metadata = {
@@ -192,6 +193,11 @@ export default function TestPage() {
           items={serviceCards}
           variant="image"
         />
+      </div>
+
+      {/* ─── SOCIAL SPACES ─── */}
+      <div className="border-t border-white/10">
+        <SocialSpacesSection />
       </div>
 
       {/* ─── MIXES (auto-synced from Mixcloud) ─── */}
