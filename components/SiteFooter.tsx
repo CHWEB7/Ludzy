@@ -58,6 +58,17 @@ export function SiteFooter() {
         <p className="text-[10px] uppercase tracking-[0.3em] text-white/20">
           &copy; {new Date().getFullYear()} DJ Ludzy. All rights reserved.
         </p>
+        <p className="mt-3 text-[10px] uppercase tracking-[0.25em] text-white/20">
+          Website by{" "}
+          <a
+            href="https://www.voltrondigital.co.uk/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/35 transition hover:text-white/60"
+          >
+            Voltron Digital
+          </a>
+        </p>
       </div>
     </footer>
   );
