@@ -5,6 +5,8 @@ import { useEnquiryForm } from "@/lib/use-enquiry-form";
 const inputClass =
   "mt-2 w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-white";
 
+const selectClass = `${inputClass} cursor-pointer [color-scheme:dark]`;
+
 export function TestContactForm() {
   const { submitting, succeeded, error, handleSubmit } = useEnquiryForm();
 
@@ -17,7 +19,7 @@ export function TestContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="test-contact-form space-y-8">
       <input
         type="text"
         name="_gotcha"
@@ -71,19 +73,33 @@ export function TestContactForm() {
             id="event_type"
             name="event_type"
             required
-            className={`${inputClass} cursor-pointer`}
+            className={selectClass}
             defaultValue=""
           >
-            <option value="" disabled>
+            <option value="" disabled className="bg-black text-white/40">
               Select…
             </option>
-            <option value="wedding">Wedding</option>
-            <option value="private-party">Private party</option>
-            <option value="corporate">Corporate event</option>
-            <option value="residency">Venue residency</option>
-            <option value="terrace">Terrace / garden party</option>
-            <option value="festival">Festival</option>
-            <option value="other">Other</option>
+            <option value="wedding" className="bg-black text-white">
+              Wedding
+            </option>
+            <option value="private-party" className="bg-black text-white">
+              Private party
+            </option>
+            <option value="corporate" className="bg-black text-white">
+              Corporate event
+            </option>
+            <option value="residency" className="bg-black text-white">
+              Venue residency
+            </option>
+            <option value="terrace" className="bg-black text-white">
+              Terrace / garden party
+            </option>
+            <option value="festival" className="bg-black text-white">
+              Festival
+            </option>
+            <option value="other" className="bg-black text-white">
+              Other
+            </option>
           </select>
         </label>
       </div>

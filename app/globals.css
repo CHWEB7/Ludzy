@@ -19,6 +19,17 @@ body {
   font-family: var(--font-outfit), system-ui, sans-serif;
 }
 
+/* Contact form — native select text on dark backgrounds (Safari / iOS) */
+.test-contact-form select {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.test-contact-form select option {
+  color: #ffffff;
+  background-color: #0a0a0a;
+}
+
 .glass-panel {
   @apply border border-white/10 bg-black/50 backdrop-blur-md;
 }
