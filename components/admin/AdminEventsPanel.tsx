@@ -20,7 +20,7 @@ import {
   EVENT_SOFT_DELETE_DAYS,
   formatEventPurgeDate,
 } from "@/lib/event-soft-delete";
-import type { EventRecord } from "@/lib/events-db";
+import { sortUpcomingEventRecords, type EventRecord } from "@/lib/events-db";
 import { createAdminBrowserClient } from "@/lib/supabase/browser-admin";
 
 type EventForm = {
@@ -458,7 +458,9 @@ export function AdminEventsPanel() {
   );
 
   const previousEvents = events.filter((e) => e.event_type === "previous");
-  const upcomingEvents = events.filter((e) => e.event_type === "upcoming");
+  const upcomingEvents = sortUpcomingEventRecords(
+    events.filter((e) => e.event_type === "upcoming"),
+  );
 
   const inputClass =
     "mt-1 w-full border border-white/15 bg-black/50 px-3 py-2 text-sm text-white outline-none focus:border-white";

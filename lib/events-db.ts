@@ -90,6 +90,20 @@ export function toUpcomingEvent(e: EventRecord): UpcomingEvent {
   };
 }
 
+/** Upcoming diary: earliest event date first. */
+export function sortUpcomingEventRecords(events: EventRecord[]): EventRecord[] {
+  return [...events].sort((a, b) => {
+    const aDate = a.event_date ?? "";
+    const bDate = b.event_date ?? "";
+    if (!aDate && !bDate) return b.sort_order - a.sort_order;
+    if (!aDate) return 1;
+    if (!bDate) return -1;
+    const byDate = aDate.localeCompare(bDate);
+    if (byDate !== 0) return byDate;
+    return b.sort_order - a.sort_order;
+  });
+}
+
 export async function fetchPublishedEvents(): Promise<{
   previous: EventRecord[];
   upcoming: EventRecord[];
@@ -119,7 +133,7 @@ export async function fetchPublishedEvents(): Promise<{
   const rows = data.map((r) => mapRow(r as Record<string, unknown>));
   return {
     previous: rows.filter((r) => r.event_type === "previous"),
-    upcoming: rows.filter((r) => r.event_type === "upcoming"),
+    upcoming: sortUpcomingEventRecords(rows.filter((r) => r.event_type === "upcoming")),
   };
 }
 
