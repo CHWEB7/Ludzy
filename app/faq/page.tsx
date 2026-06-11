@@ -106,7 +106,7 @@ export default function FaqPage() {
           <h2 className="mt-3 font-display text-2xl font-bold uppercase tracking-[-0.01em] text-white md:text-3xl">
             Booking &amp; music
           </h2>
-          <div className="mx-auto mt-10 max-w-3xl border border-white/10 bg-black/30 p-6 md:p-10">
+          <div className="mt-10 w-full border border-white/10 bg-black/30 p-4 md:p-8">
             <FaqAccordion items={faqs} />
           </div>
         </div>
