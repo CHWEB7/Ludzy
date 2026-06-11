@@ -1,7 +1,6 @@
 import Image from "next/image";
 
-const PEXELS_LOUNGE =
-  "https://images.pexels.com/photos/2574489/pexels-photo-2574489.jpeg?auto=compress&cs=tinysrgb&w=1400&q=80";
+const SOCIAL_SPACES_IMAGE = "/images/social-spaces.jpg";
 
 const musicTags = ["Organic house", "Melodic house", "Soulful edits", "UK garage", "Nu disco"];
 
@@ -56,16 +55,17 @@ export function SocialSpacesSection() {
           <TagGroup label="Labels & artists" tags={labelArtistTags} />
         </div>
 
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm">
+        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm border border-white/10">
           <Image
-            src={PEXELS_LOUNGE}
-            alt="Cocktail lounge with warm ambient lighting"
+            src={SOCIAL_SPACES_IMAGE}
+            alt="Ludzy DJ providing a sophisticated soundtrack in a social space"
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover brightness-75 saturate-[0.3]"
+            className="object-cover object-[center_22%] brightness-[0.72] contrast-[1.05] saturate-0"
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/35" />
+          <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
         </div>
       </div>
     </section>
