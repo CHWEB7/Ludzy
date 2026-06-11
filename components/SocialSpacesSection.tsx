@@ -1,43 +1,12 @@
-import Image from "next/image";
+import Link from "next/link";
 
 const SOCIAL_SPACES_IMAGE = "/images/social-spaces.jpg";
-
-const musicTags = ["Organic house", "Melodic house", "Soulful edits", "UK garage", "Nu disco"];
-
-const builtForTags = ["Lounges & bars", "Restaurants", "Hotels & terraces", "Members' clubs"];
-
-const labelArtistTags = [
-  "Anjunadeep",
-  "Ben Böhmer",
-  "Fred again..",
-  "Sammy Virji",
-  "Lane 8",
-  "BICEP",
-];
-
-const tagClass =
-  "rounded-full border border-white/15 px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/50";
-
-function TagGroup({ label, tags }: { label: string; tags: string[] }) {
-  return (
-    <div className="mt-8">
-      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">{label}</p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <span key={tag} className={tagClass}>
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export function SocialSpacesSection() {
   return (
     <section className="relative px-6 py-24 md:px-12 md:py-36 lg:px-20">
-      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-20">
-        <div>
+      <div className="mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16 xl:gap-20">
+        <div className="order-2 lg:order-1">
           <p className="text-[11px] font-medium uppercase tracking-[0.4em] text-white/40">
             Social spaces
           </p>
@@ -45,27 +14,47 @@ export function SocialSpacesSection() {
             Sophisticated<br />
             soundscapes.
           </h2>
-          <p className="mt-8 max-w-md text-base leading-relaxed text-white/55">
-            Curated atmospheres for rooms where conversation and ambience matter — restrained
-            grooves, melodic detail, and music that elevates the space without dominating it.
-          </p>
 
-          <TagGroup label="The music" tags={musicTags} />
-          <TagGroup label="Built for" tags={builtForTags} />
-          <TagGroup label="Labels & artists" tags={labelArtistTags} />
+          <div className="mt-8 max-w-xl space-y-5 text-base leading-relaxed text-white/55">
+            <p>
+              Curated atmospheres for rooms where conversation and ambience matter as much as
+              the playlist — restrained grooves, melodic detail, and music that elevates the
+              space without dominating it.
+            </p>
+            <p>
+              The sound draws on organic house, melodic house, soulful edits, UK garage, and
+              nu disco — the same palette heard across Ludzy&apos;s Mixcloud sessions, shaped
+              by labels such as Anjunadeep and artists including Ben Böhmer, Fred again..,
+              Sammy Virji, Lane 8, and BICEP.
+            </p>
+            <p>
+              Built for lounges and bars, restaurant dining rooms, hotel terraces, and
+              members&apos; clubs — anywhere a refined, consistent sonic identity is needed
+              from afternoon through to evening.
+            </p>
+          </div>
+
+          <div className="mt-10">
+            <Link
+              href="/events"
+              className="test-btn-ghost inline-flex items-center px-8 py-3.5 text-[11px] font-bold uppercase tracking-[0.3em]"
+            >
+              Previous events
+            </Link>
+          </div>
         </div>
 
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm border border-white/10">
-          <Image
-            src={SOCIAL_SPACES_IMAGE}
-            alt="Ludzy DJ providing a sophisticated soundtrack in a social space"
-            fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover object-[center_22%] brightness-[0.72] contrast-[1.05] saturate-0"
-            unoptimized
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/35" />
-          <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
+        <div className="order-1 lg:order-2">
+          <div className="relative overflow-hidden rounded-sm border border-white/10 bg-black/40">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={SOCIAL_SPACES_IMAGE}
+              alt="Ludzy DJ providing a sophisticated soundtrack in a social space"
+              className="block h-auto w-full brightness-[0.78] contrast-[1.05] saturate-0"
+              decoding="async"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+          </div>
         </div>
       </div>
     </section>
