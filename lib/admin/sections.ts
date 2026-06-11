@@ -22,6 +22,13 @@ export const adminSections: AdminSection[] = [
     available: true,
   },
   {
+    id: "faq",
+    title: "FAQs",
+    description: "Manage frequently asked questions on the FAQ page.",
+    href: "/admin/faq",
+    available: true,
+  },
+  {
     id: "site-content",
     title: "Site content",
     description: "Homepage copy, services, and other page content.",
