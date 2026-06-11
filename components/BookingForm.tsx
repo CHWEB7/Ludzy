@@ -1,51 +1,22 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useForm, ValidationError } from "@formspree/react";
+import { FORMSPREE_FORM_ID } from "@/lib/formspree";
+
+const inputClass =
+  "mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white";
+
+const fieldErrorClass = "mt-1 block text-xs text-rose-300";
 
 export function BookingForm() {
-  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
-  const [message, setMessage] = useState("");
+  const [state, handleSubmit] = useForm(FORMSPREE_FORM_ID);
 
-  async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
-    ev.preventDefault();
-    setStatus("sending");
-    setMessage("");
-
-    const form = ev.currentTarget;
-    const formData = new FormData(form);
-    const payload = {
-      name: String(formData.get("name") ?? ""),
-      email: String(formData.get("email") ?? ""),
-      phone: String(formData.get("phone") ?? ""),
-      event_type: String(formData.get("event_type") ?? ""),
-      event_date: String(formData.get("event_date") ?? ""),
-      message: String(formData.get("message") ?? ""),
-    };
-
-    try {
-      const res = await fetch("/api/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as { error?: string; ok?: boolean };
-
-      if (!res.ok) {
-        throw new Error(data.error || `Request failed (${res.status})`);
-      }
-
-      setStatus("ok");
-      setMessage("Thank you — enquiry received. We'll be in touch soon.");
-      form.reset();
-    } catch (err) {
-      setStatus("err");
-      const text =
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please call or email directly.";
-      setMessage(text);
-    }
+  if (state.succeeded) {
+    return (
+      <p className="text-center text-sm leading-relaxed text-emerald-300" role="status">
+        Thank you — enquiry received. We&apos;ll be in touch soon.
+      </p>
+    );
   }
 
   return (
@@ -57,23 +28,27 @@ export function BookingForm() {
         <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
           Name
           <input
+            id="booking-name"
             name="name"
             required
             autoComplete="name"
-            className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
+            className={inputClass}
             placeholder="Your name"
           />
+          <ValidationError prefix="Name" field="name" errors={state.errors} className={fieldErrorClass} />
         </label>
         <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
           Email
           <input
+            id="booking-email"
             name="email"
             type="email"
             required
             autoComplete="email"
-            className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
+            className={inputClass}
             placeholder="you@example.com"
           />
+          <ValidationError prefix="Email" field="email" errors={state.errors} className={fieldErrorClass} />
         </label>
       </div>
 
@@ -81,19 +56,21 @@ export function BookingForm() {
         <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
           Phone
           <input
+            id="booking-phone"
             name="phone"
             type="tel"
             autoComplete="tel"
-            className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
+            className={inputClass}
             placeholder="Optional"
           />
         </label>
         <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
           Event type
           <select
+            id="booking-event_type"
             name="event_type"
             required
-            className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
+            className={inputClass}
             defaultValue=""
           >
             <option value="" disabled>
@@ -106,47 +83,44 @@ export function BookingForm() {
             <option value="garden">Garden parties</option>
             <option value="other">Other</option>
           </select>
+          <ValidationError
+            prefix="Event type"
+            field="event_type"
+            errors={state.errors}
+            className={fieldErrorClass}
+          />
         </label>
       </div>
 
       <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
         Event date (optional)
-        <input
-          name="event_date"
-          type="date"
-          className="mt-2 w-full rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
-        />
+        <input id="booking-event_date" name="event_date" type="date" className={inputClass} />
       </label>
 
       <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
         Message
         <textarea
+          id="booking-message"
           name="message"
           required
           rows={4}
-          className="mt-2 w-full resize-y rounded-xl border border-white/15 bg-black/60 px-4 py-3 text-sm text-white outline-none transition focus:border-white"
+          className={`${inputClass} resize-y`}
           placeholder="Venue, timings, vibe, must-plays…"
         />
+        <ValidationError prefix="Message" field="message" errors={state.errors} className={fieldErrorClass} />
       </label>
+
+      <input type="hidden" name="_subject" value="New Ludzy enquiry from ludzy.online" />
 
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={state.submitting}
         className="w-full rounded-full bg-white py-3 text-xs font-semibold uppercase tracking-[0.25em] text-black transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {status === "sending" ? "Sending…" : "Send enquiry"}
+        {state.submitting ? "Sending…" : "Send enquiry"}
       </button>
 
-      {message && (
-        <p
-          className={`text-center text-sm leading-relaxed ${
-            status === "ok" ? "text-emerald-300" : "text-rose-300"
-          }`}
-          role="status"
-        >
-          {message}
-        </p>
-      )}
+      <ValidationError errors={state.errors} className="text-center text-sm text-rose-300" />
     </form>
   );
 }

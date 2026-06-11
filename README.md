@@ -2,19 +2,14 @@
 
 Monochrome promotional site inspired by the LUDZY flyer: floating navigation with a logo that fades on scroll, interactive service cards with detail modals, and a booking form wired to Supabase.
 
-## Contact form email (Resend)
+## Contact form (Formspree)
 
-Enquiries are saved to Supabase `booking_inquiries` and a notification email is sent via [Resend](https://resend.com).
+The contact form uses [Formspree](https://formspree.io) via `@formspree/react`. Submissions are emailed to the address configured in your Formspree dashboard.
 
-1. Create a Resend account and generate an API key.
-2. Add to `.env.local` (local) and Vercel → **Settings → Environment Variables**:
-   - `RESEND_API_KEY` — required for email delivery
-   - `BOOKING_NOTIFY_EMAIL` — inbox that receives enquiries (default: `info@ajeventspromotions.com`)
-   - `BOOKING_FROM_EMAIL` — sender shown on the notification (optional)
-3. **Development:** omit `BOOKING_FROM_EMAIL` to use Resend’s test sender `onboarding@resend.dev` (emails only deliver to your Resend account email until you verify a domain).
-4. **Production:** verify `ludzy.online` in Resend → **Domains**, then set e.g. `BOOKING_FROM_EMAIL=DJ Ludzy <bookings@ludzy.online>`.
+- Default form ID: `xpqelvge` (`https://formspree.io/f/xpqelvge`)
+- Optional override: `NEXT_PUBLIC_FORMSPREE_FORM_ID` in `.env.local` and Vercel
 
-If the database save succeeds but email fails (missing key or Resend error), the visitor still sees success; the error is logged server-side. Check the API response field `emailSent` when debugging.
+In Formspree → **Settings**, set notification email to `info@ajeventspromotions.com` and enable reply-to from the submitter’s `email` field.
 
 ## Mixcloud auto-sync
 

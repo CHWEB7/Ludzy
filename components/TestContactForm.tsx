@@ -1,53 +1,23 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useForm, ValidationError } from "@formspree/react";
+import { FORMSPREE_FORM_ID } from "@/lib/formspree";
+
+const inputClass =
+  "mt-2 w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-white";
+
+const fieldErrorClass = "mt-1 block text-xs text-rose-400";
 
 export function TestContactForm() {
-  const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
-  const [message, setMessage] = useState("");
+  const [state, handleSubmit] = useForm(FORMSPREE_FORM_ID);
 
-  async function handleSubmit(ev: FormEvent<HTMLFormElement>) {
-    ev.preventDefault();
-    setStatus("sending");
-    setMessage("");
-
-    const form = ev.currentTarget;
-    const fd = new FormData(form);
-    const payload = {
-      name: String(fd.get("name") ?? ""),
-      email: String(fd.get("email") ?? ""),
-      phone: String(fd.get("phone") ?? ""),
-      event_type: String(fd.get("event_type") ?? ""),
-      event_date: String(fd.get("event_date") ?? ""),
-      message: String(fd.get("message") ?? ""),
-    };
-
-    try {
-      const res = await fetch("/api/booking", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as { error?: string; ok?: boolean };
-
-      if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
-
-      setStatus("ok");
-      setMessage("Thank you — enquiry received. We'll be in touch soon.");
-      form.reset();
-    } catch (err) {
-      setStatus("err");
-      setMessage(
-        err instanceof Error
-          ? err.message
-          : "Something went wrong. Please call or email directly.",
-      );
-    }
+  if (state.succeeded) {
+    return (
+      <p className="text-center text-sm leading-relaxed text-emerald-400" role="status">
+        Thank you — enquiry received. We&apos;ll be in touch soon.
+      </p>
+    );
   }
-
-  const inputClass =
-    "mt-2 w-full border-b border-white/20 bg-transparent px-0 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-white";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -55,16 +25,19 @@ export function TestContactForm() {
         <label className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
           Name *
           <input
+            id="name"
             name="name"
             required
             autoComplete="name"
             className={inputClass}
             placeholder="Your name"
           />
+          <ValidationError prefix="Name" field="name" errors={state.errors} className={fieldErrorClass} />
         </label>
         <label className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
           Email *
           <input
+            id="email"
             name="email"
             type="email"
             required
@@ -72,6 +45,7 @@ export function TestContactForm() {
             className={inputClass}
             placeholder="you@example.com"
           />
+          <ValidationError prefix="Email" field="email" errors={state.errors} className={fieldErrorClass} />
         </label>
       </div>
 
@@ -79,6 +53,7 @@ export function TestContactForm() {
         <label className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
           Phone
           <input
+            id="phone"
             name="phone"
             type="tel"
             autoComplete="tel"
@@ -89,6 +64,7 @@ export function TestContactForm() {
         <label className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
           Event type *
           <select
+            id="event_type"
             name="event_type"
             required
             className={`${inputClass} cursor-pointer`}
@@ -105,47 +81,44 @@ export function TestContactForm() {
             <option value="festival">Festival</option>
             <option value="other">Other</option>
           </select>
+          <ValidationError
+            prefix="Event type"
+            field="event_type"
+            errors={state.errors}
+            className={fieldErrorClass}
+          />
         </label>
       </div>
 
       <label className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
         Event date
-        <input
-          name="event_date"
-          type="date"
-          className={inputClass}
-        />
+        <input id="event_date" name="event_date" type="date" className={inputClass} />
       </label>
 
       <label className="block text-[11px] font-bold uppercase tracking-[0.25em] text-white/50">
         Tell us about your event *
         <textarea
+          id="message"
           name="message"
           required
           rows={5}
           className={`${inputClass} resize-y`}
           placeholder="Venue, timings, guest count, vibe, must-plays…"
         />
+        <ValidationError prefix="Message" field="message" errors={state.errors} className={fieldErrorClass} />
       </label>
+
+      <input type="hidden" name="_subject" value="New Ludzy enquiry from ludzy.online" />
 
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={state.submitting}
         className="test-btn-primary w-full px-8 py-4 text-[11px] font-bold uppercase tracking-[0.3em] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {status === "sending" ? "Sending…" : "Send enquiry"}
+        {state.submitting ? "Sending…" : "Send enquiry"}
       </button>
 
-      {message && (
-        <p
-          className={`text-center text-sm leading-relaxed ${
-            status === "ok" ? "text-emerald-400" : "text-rose-400"
-          }`}
-          role="status"
-        >
-          {message}
-        </p>
-      )}
+      <ValidationError errors={state.errors} className="text-center text-sm text-rose-400" />
     </form>
   );
 }
