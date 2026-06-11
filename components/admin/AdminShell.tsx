@@ -8,10 +8,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const header = document.querySelector<HTMLElement>("[data-test-header]");
     const crispChatbox = document.querySelector<HTMLElement>("#crisp-chatbox");
-    const crispLauncher = document.querySelector<HTMLElement>("#ludzy-crisp-launcher");
     if (header) header.style.display = "none";
     if (crispChatbox) crispChatbox.style.display = "none";
-    if (crispLauncher) crispLauncher.style.display = "none";
     (
       window as Window & { $crisp?: Array<unknown> }
     ).$crisp?.push(["do", "chat:hide"]);

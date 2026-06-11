@@ -3,8 +3,6 @@
 import Script from "next/script";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { CrispChatLauncher } from "@/components/CrispChatLauncher";
-import { configureCrispCustomLauncher } from "@/lib/crisp";
 
 const websiteId = process.env.NEXT_PUBLIC_CRISP_WEBSITE_ID;
 
@@ -28,26 +26,11 @@ export function CrispChatWidget() {
     return () => observer.disconnect();
   }, [isAdmin]);
 
-  useEffect(() => {
-    if (isAdmin || !websiteId) return;
-    configureCrispCustomLauncher();
-    window.$crisp?.push([
-      "on",
-      "session:loaded",
-      function onCrispSessionLoaded() {
-        configureCrispCustomLauncher();
-      },
-    ]);
-  }, [isAdmin]);
-
   if (isAdmin || !websiteId) return null;
 
   return (
-    <>
-      <Script id="crisp-chat" strategy="afterInteractive">
-        {`window.$crisp=[];window.CRISP_WEBSITE_ID="${websiteId}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`}
-      </Script>
-      <CrispChatLauncher />
-    </>
+    <Script id="crisp-chat" strategy="afterInteractive">
+      {`window.$crisp=[];window.CRISP_WEBSITE_ID="${websiteId}";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();`}
+    </Script>
   );
 }
