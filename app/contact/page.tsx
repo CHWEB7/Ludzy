@@ -6,7 +6,7 @@ import { siteSocials } from "@/lib/site-socials";
 export const metadata: Metadata = {
   title: "Contact | DJ Ludzy — Book a DJ in Suffolk",
   description:
-    "Get in touch with DJ Ludzy. Available for weddings, private parties, corporate events, and venue residencies across Suffolk, Ipswich, Woodbridge, Framlingham, and East Anglia.",
+    "Get in touch with DJ Ludzy. Grounded in Suffolk, available worldwide for weddings, private parties, corporate events, and venue residencies.",
 };
 
 const contactMethods = [
@@ -31,7 +31,10 @@ export default function ContactPage() {
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.4em] text-white/40">Get in touch</p>
               <h1 className="mt-4 font-display text-4xl font-bold uppercase leading-[0.92] tracking-[-0.01em] text-white md:text-5xl lg:text-6xl">Let&apos;s talk</h1>
-              <p className="mt-6 max-w-md text-base leading-relaxed text-white/55 md:text-lg">Whether it&apos;s a wedding in Woodbridge, a garden party in Framlingham, or a corporate event in Ipswich — send a brief and we&apos;ll get back to you within 24 hours.</p>
+              <p className="mt-6 max-w-md text-base leading-relaxed text-white/55 md:text-lg">
+                Grounded in Suffolk, covering the globe — send a brief with your venue, date,
+                and vibe and we&apos;ll get back to you within 24 hours.
+              </p>
               <div className="mt-12 space-y-4">
                 {contactMethods.map((m) => (
                   <a key={m.label} href={m.href} target={m.href.startsWith("http") ? "_blank" : undefined} rel={m.href.startsWith("http") ? "noopener noreferrer" : undefined} className="group flex items-center gap-4 border-b border-white/10 pb-4 transition hover:border-white/25">
@@ -64,7 +67,10 @@ export default function ContactPage() {
               </div>
               <div className="mt-12 border-t border-white/10 pt-8">
                 <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">Areas covered</p>
-                <p className="text-sm leading-relaxed text-white/50">Ipswich · Woodbridge · Framlingham · Southwold · Diss · Eye — and all of Suffolk &amp; East Anglia</p>
+                <p className="text-sm leading-relaxed text-white/50">
+                  Based in Suffolk — available across the UK and internationally for the right
+                  event.
+                </p>
               </div>
             </div>
             <div>

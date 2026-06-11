@@ -95,9 +95,8 @@ export default function ContactPage() {
                 Let&apos;s talk
               </h1>
               <p className="mt-6 max-w-md text-base leading-relaxed text-white/55 md:text-lg">
-                Whether it&apos;s a wedding in Woodbridge, a garden party in
-                Framlingham, or a corporate event in Ipswich — send a brief and
-                we&apos;ll get back to you within 24 hours.
+                Grounded in Suffolk, covering the globe — send a brief with your venue, date,
+                and vibe and we&apos;ll get back to you within 24 hours.
               </p>
 
               {/* Direct contact */}
@@ -160,8 +159,8 @@ export default function ContactPage() {
                   Areas covered
                 </p>
                 <p className="text-sm leading-relaxed text-white/50">
-                  Ipswich · Woodbridge · Framlingham · Southwold · Diss · Eye
-                  — and all of Suffolk &amp; East Anglia
+                  Based in Suffolk — available across the UK and internationally for the right
+                  event.
                 </p>
               </div>
             </div>
