@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Dancing_Script, Outfit } from "next/font/google";
-import { ConvoraChatWidget } from "@/components/ConvoraChatWidget";
+import { CrispChatWidget } from "@/components/CrispChatWidget";
 import "./globals.css";
 import { TestHeader } from "@/components/TestHeader";
 
@@ -48,7 +48,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-ink antialiased">
         <TestHeader />
         {children}
-        <ConvoraChatWidget />
+        <CrispChatWidget />
         <Analytics />
       </body>
     </html>

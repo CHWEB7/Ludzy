@@ -7,9 +7,12 @@ import { AdminThemeToggle } from "@/components/admin/AdminThemeToggle";
 export function AdminShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const header = document.querySelector<HTMLElement>("[data-test-header]");
-    const convora = document.querySelector<HTMLElement>("#convora-widget-root");
+    const crispChatbox = document.querySelector<HTMLElement>("#crisp-chatbox");
     if (header) header.style.display = "none";
-    if (convora) convora.remove();
+    if (crispChatbox) crispChatbox.style.display = "none";
+    (
+      window as Window & { $crisp?: Array<unknown> }
+    ).$crisp?.push(["do", "chat:hide"]);
 
     return () => {
       if (header) header.style.display = "";
