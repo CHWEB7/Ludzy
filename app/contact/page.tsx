@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TestContactForm } from "@/components/TestContactForm";
+import { siteSocials } from "@/lib/site-socials";
 
 export const metadata: Metadata = {
   title: "Contact | DJ Ludzy — Book a DJ in Suffolk",
@@ -12,12 +13,6 @@ const contactMethods = [
   { label: "Phone", value: "07592 262525", href: "tel:07592262525", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /> },
   { label: "Email", value: "info@ajeventspromotions.com", href: "mailto:info@ajeventspromotions.com", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /> },
   { label: "Instagram", value: "@dj_ludzy", href: "https://www.instagram.com/dj_ludzy", icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /> },
-];
-
-const socials = [
-  { name: "Instagram", href: "https://www.instagram.com/dj_ludzy" },
-  { name: "Mixcloud", href: "https://www.mixcloud.com/DJ-Ludzy/" },
-  { name: "Facebook", href: "https://www.facebook.com/share/1BWMcvt3xe/" },
 ];
 
 export default function ContactPage() {
@@ -52,8 +47,19 @@ export default function ContactPage() {
               </div>
               <div className="mt-12">
                 <p className="mb-4 text-[11px] font-bold uppercase tracking-[0.25em] text-white/40">Follow</p>
-                <div className="flex gap-4">
-                  {socials.map((s) => (<a key={s.name} href={s.href} target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/45 transition hover:text-white">{s.name}</a>))}
+                <div className="flex flex-col gap-2">
+                  {siteSocials.map((s) => (
+                    <a
+                      key={s.name}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-white/45 transition hover:text-white"
+                    >
+                      {s.icon}
+                      {s.name}
+                    </a>
+                  ))}
                 </div>
               </div>
               <div className="mt-12 border-t border-white/10 pt-8">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { MixcloudListenSection } from "@/components/MixcloudListenSection";
+import { SiteFooter } from "@/components/SiteFooter";
 import { TestScrollCards } from "@/components/TestScrollCards";
 
 export const dynamic = "force-dynamic";
@@ -167,34 +168,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-white/10 bg-black px-6 py-12 md:px-12 lg:px-20">
-        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-3">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-white/50">DJ Ludzy</p>
-            <p className="mt-3 text-[11px] leading-relaxed tracking-wide text-white/30">House &amp; dance music DJ — Suffolk &amp; East Anglia</p>
-          </div>
-          <div>
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">Pages</p>
-            <nav className="flex flex-col gap-2">
-              <Link href="/contact" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white">Contact</Link>
-              <Link href="/faq" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white">FAQ</Link>
-              <Link href="/privacy" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white">Privacy Policy</Link>
-            </nav>
-          </div>
-          <div>
-            <p className="mb-4 text-[10px] font-bold uppercase tracking-[0.3em] text-white/25">Socials</p>
-            <nav className="flex flex-col gap-2">
-              <a href="https://www.instagram.com/dj_ludzy" target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white">Instagram</a>
-              <a href="https://www.mixcloud.com/DJ-Ludzy/" target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white">Mixcloud</a>
-              <a href="https://www.facebook.com/share/1BWMcvt3xe/" target="_blank" rel="noopener noreferrer" className="text-[11px] font-semibold uppercase tracking-[0.25em] text-white/40 transition hover:text-white">Facebook</a>
-            </nav>
-          </div>
-        </div>
-        <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 pt-6 text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-white/20">&copy; {new Date().getFullYear()} DJ Ludzy. All rights reserved.</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
